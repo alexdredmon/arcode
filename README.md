@@ -1,0 +1,2 @@
+# codey
+AI coding agent
