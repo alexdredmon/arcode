@@ -7,6 +7,8 @@ import io
 from contextlib import redirect_stdout
 from openai import OpenAI
 from config import API_KEY
+from InquirerPy import prompt
+import pyperclip
 
 AUTODEV_PROMPT_PRE = """
 You are a software development team.  I'm going to provide you with your codebase, then we'll build some features.
@@ -149,13 +151,26 @@ def main():
     )
 
     print(f"{LIGHT_GREEN}Streaming response:{RESET_COLOR}")
-    inside_triple_stars = False  # Track whether inside **********
+    streamed_response = ""
     for chunk in completion:
         delta = chunk.choices[0].delta
-        if hasattr(delta, "content"):
+        if hasattr(delta, "content") and delta.content is not None:
             print(f"{LIGHT_PINK}{delta.content}{RESET_COLOR}", end="", flush=True)
-        else:
-            print(f"{LIGHT_PINK}Chunk received: {chunk}{RESET_COLOR}", flush=True)
+            streamed_response += delta.content
+
+    questions = [
+        {
+            'type': 'list',
+            'name': 'next_step',
+            'message': 'What would you like to do next?',
+            'choices': ['Copy response to clipboard', 'Exit']
+        }
+    ]
+
+    answers = prompt(questions)
+    if answers['next_step'] == 'Copy response to clipboard':
+        pyperclip.copy(streamed_response)
+        print("Response copied to clipboard.")
 
 if __name__ == "__main__":
     main()
