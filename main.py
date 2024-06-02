@@ -10,10 +10,13 @@ import pyperclip
 from config import API_KEY
 from lib.argument_parser import parse_arguments
 from lib.gitignore_parser import parse_gitignore
-from lib.file_util import print_tree, print_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters
-from lib.openai_client import create_openai_client, AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE, LIGHT_PINK, LIGHT_GREEN, RESET_COLOR
+from lib.file_util import print_tree, print_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters, calculate_line_difference
+from lib.openai_client import create_openai_client, AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE
+from lib.shell_util import (
+    LIGHT_PINK, LIGHT_GREEN, LIGHT_RED, LIGHT_BLUE, RESET_COLOR, WHITE_ON_DARK_BLUE, BLACK_ON_WHITE,
+    WHITE_ON_BLACK
+)
 from lib.file_writer import write_files
-
 
 def main():
     args = parse_arguments()
@@ -45,7 +48,7 @@ def main():
     if not API_KEY:
         raise ValueError("API_KEY is not set")
 
-    print(f"{LIGHT_GREEN}Building feature(s):\n{requirements}{RESET_COLOR}")
+    print(f"\n{WHITE_ON_BLACK} 🏗️  {BLACK_ON_WHITE} BUILDING FEATURE(S): {RESET_COLOR}\n{LIGHT_BLUE}{requirements}{RESET_COLOR}")
 
     client = create_openai_client(API_KEY)
     completion = client.chat.completions.create(
@@ -57,7 +60,7 @@ def main():
         stream=True
     )
 
-    print(f"{LIGHT_GREEN}Streaming response:{RESET_COLOR}")
+    print(f"\n{WHITE_ON_BLACK} 🌐 {BLACK_ON_WHITE} STREAMING RESPONSE: {RESET_COLOR}")
     streamed_response = ""
     response_chunks = []
 
@@ -68,13 +71,22 @@ def main():
             streamed_response += delta.content
             response_chunks.append(delta.content)
 
-    choices = ['Copy full response']
+    choices = ['Write changeset to files', 'Copy full response']
     files = parse_files(streamed_response)
     for file in files:
         filename = file["filename"]
         choices.append(f"Copy file {filename}")
 
-    choices.append('Write changeset to files')
+    # Print file changes
+    for file in files:
+        filename = file["filename"]
+        new_content = file["contents"]
+        line_diff = calculate_line_difference(os.path.join(args.dir, filename), new_content)
+        line_diff_str = f"{LIGHT_GREEN}{filename} ({line_diff:+d}){RESET_COLOR}"
+        print(f"\n\n{WHITE_ON_BLACK} 📁 {BLACK_ON_WHITE} FILES TO UPDATE: {RESET_COLOR}")
+        print(line_diff_str)
+        print("")
+
     choices.append("Exit")
 
     answers = {
@@ -84,11 +96,12 @@ def main():
         {
             'type': 'list',
             'name': 'next_step',
-            'message': 'What would you like to do next?',
+            'message': '↕',
             'choices': choices,
         }
     ]
 
+    print(f"{WHITE_ON_BLACK} ⚡️ {BLACK_ON_WHITE} ACTION: {RESET_COLOR}")
     while answers["next_step"] != "Exit":
         answers = prompt(questions)
 

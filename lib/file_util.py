@@ -73,3 +73,13 @@ def extract_estimated_characters(string):
     if match:
         return int(match.group(1))
     return 0
+
+def calculate_line_difference(filepath, new_content):
+    try:
+        with open(filepath, 'r', encoding='utf-8') as file:
+            current_content = file.read()
+        current_lines = current_content.count('\n')
+        new_lines = new_content.count('\n')
+        return new_lines - current_lines
+    except FileNotFoundError:
+        return len(new_content.splitlines())  # If file does not exist, return total lines as added

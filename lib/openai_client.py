@@ -42,9 +42,5 @@ print("Hello world")
 ===.= ==== EOF: lib/demofile2.py = ===== =========
 """
 
-LIGHT_PINK = '\033[95m'
-LIGHT_GREEN = '\033[92m'
-RESET_COLOR = '\033[0m'
-
 def create_openai_client(api_key):
     return OpenAI(api_key=api_key)
