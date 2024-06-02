@@ -12,6 +12,7 @@ from lib.argument_parser import parse_arguments
 from lib.gitignore_parser import parse_gitignore
 from lib.file_util import print_tree, print_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters
 from lib.openai_client import create_openai_client, AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE, LIGHT_PINK, LIGHT_GREEN, RESET_COLOR
+from lib.file_writer import write_files
 
 
 def main():
@@ -41,7 +42,6 @@ def main():
 
     USER_CONTENT = f.getvalue()
 
-    # Ensure the API key is set
     if not API_KEY:
         raise ValueError("API_KEY is not set")
 
@@ -74,6 +74,7 @@ def main():
         filename = file["filename"]
         choices.append(f"Copy file {filename}")
 
+    choices.append('Write changeset to files')
     choices.append("Exit")
 
     answers = {
@@ -95,11 +96,16 @@ def main():
             pyperclip.copy(streamed_response)
             print("Response copied to clipboard.")
 
-        if answers['next_step'].startswith("Copy file "):
+        elif answers['next_step'].startswith("Copy file "):
             for file in files:
                 filename = file["filename"]
                 if answers['next_step'] == f"Copy file {filename}":
                     pyperclip.copy(file["contents"])
+
+        elif answers['next_step'] == 'Write changeset to files':
+            write_files(files, args.dir)
+            print("Changeset written to files.")
+    
 
 if __name__ == "__main__":
     main()

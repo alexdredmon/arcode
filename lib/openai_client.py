@@ -6,6 +6,8 @@ You are a software development team. I'm going to provide you with your codebase
 Take careful care to follow the requested response format, using "===.= ==== FILENAME: file1.py = ===== =========" and "===.= ==== EOF = ===== =========" delimiters when outputting files and "SUMMARY:" and "FILES:" section headers to indicate the respective parts of the chat completion response.
 Always include an "ESTIMATED CHARACTERS:" heading followed by an estimated number of total characters in the modified files after implementing the requested changes (i.e. total number of characters in these files, not just the number of characters changed)- it is fine if this number is not exact but always provide an estimate and express it with digits only (no commas/formatting).
 
+Take a modular approach and implement DRY code - break into separate modules if/when possible.
+
 Here's my codebase:
 """
 
