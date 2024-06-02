@@ -1,7 +1,7 @@
 # codey
 AI coding agent
 
-![Codey logo](logo.png)
+![Codey logo](logo.jpg)
 
 ## Description
 
