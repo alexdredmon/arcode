@@ -71,53 +71,57 @@ def main():
             streamed_response += delta.content
             response_chunks.append(delta.content)
 
-    choices = ['Write changeset to files', 'Copy full response']
     files = parse_files(streamed_response)
-    for file in files:
-        filename = file["filename"]
-        choices.append(f"Copy file {filename}")
+    if sys.stdin.isatty():
+        choices = ['Write changeset to files', 'Copy full response']
+        for file in files:
+            filename = file["filename"]
+            choices.append(f"Copy file {filename}")
 
-    # Print file changes
-    for file in files:
-        filename = file["filename"]
-        new_content = file["contents"]
-        line_diff = calculate_line_difference(os.path.join(args.dir, filename), new_content)
-        line_diff_str = f"{LIGHT_GREEN}{filename} ({line_diff:+d}){RESET_COLOR}"
-        print(f"\n\n{WHITE_ON_BLACK} 📁 {BLACK_ON_WHITE} FILES TO UPDATE: {RESET_COLOR}")
-        print(line_diff_str)
-        print("")
+        # Print file changes
+        for file in files:
+            filename = file["filename"]
+            new_content = file["contents"]
+            line_diff = calculate_line_difference(os.path.join(args.dir, filename), new_content)
+            line_diff_str = f"{LIGHT_GREEN}{filename} ({line_diff:+d}){RESET_COLOR}"
+            print(f"\n\n{WHITE_ON_BLACK} 📁 {BLACK_ON_WHITE} FILES TO UPDATE: {RESET_COLOR}")
+            print(line_diff_str)
+            print("")
 
-    choices.append("Exit")
+        choices.append("Exit")
 
-    answers = {
-        "next_step": None
-    }
-    questions = [
-        {
-            'type': 'list',
-            'name': 'next_step',
-            'message': '↕',
-            'choices': choices,
+        answers = {
+            "next_step": None
         }
-    ]
+        questions = [
+            {
+                'type': 'list',
+                'name': 'next_step',
+                'message': '↕',
+                'choices': choices,
+            }
+        ]
 
-    print(f"{WHITE_ON_BLACK} ⚡️ {BLACK_ON_WHITE} ACTION: {RESET_COLOR}")
-    while answers["next_step"] != "Exit":
-        answers = prompt(questions)
+        print(f"{WHITE_ON_BLACK} ⚡️ {BLACK_ON_WHITE} ACTION: {RESET_COLOR}")
+        while answers["next_step"] != "Exit":
+            answers = prompt(questions)
 
-        if answers['next_step'] == 'Copy full response':
-            pyperclip.copy(streamed_response)
-            print("Response copied to clipboard.")
+            if answers['next_step'] == 'Copy full response':
+                pyperclip.copy(streamed_response)
+                print("Response copied to clipboard.")
 
-        elif answers['next_step'].startswith("Copy file "):
-            for file in files:
-                filename = file["filename"]
-                if answers['next_step'] == f"Copy file {filename}":
-                    pyperclip.copy(file["contents"])
+            elif answers['next_step'].startswith("Copy file "):
+                for file in files:
+                    filename = file["filename"]
+                    if answers['next_step'] == f"Copy file {filename}":
+                        pyperclip.copy(file["contents"])
 
-        elif answers['next_step'] == 'Write changeset to files':
-            write_files(files, args.dir)
-            print("Changeset written to files.")
+            elif answers['next_step'] == 'Write changeset to files':
+                write_files(files, args.dir)
+                print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")
+    else:
+        write_files(files, args.dir)
+        print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")
     
 
 if __name__ == "__main__":
