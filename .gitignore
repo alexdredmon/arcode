@@ -2,3 +2,5 @@ __pycache__
 venv
 .git
 .DS_Store
+.codey.cache.pkl
+.codey.checksum.txt
