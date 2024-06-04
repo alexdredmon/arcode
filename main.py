@@ -41,7 +41,7 @@ def main():
             startpath=startpath,
             ignore_patterns=ignore_patterns,
             query=requirements,
-            num_files=42
+            num_files=args.focused,
         )
     else:
         files = get_files(startpath, ignore_patterns)
