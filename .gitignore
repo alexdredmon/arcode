@@ -4,3 +4,4 @@ venv
 .DS_Store
 .codey.cache.pkl
 .codey.checksum.txt
+.env

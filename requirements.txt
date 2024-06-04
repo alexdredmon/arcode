@@ -9,3 +9,5 @@ langchain-text-splitters==0.2.0
 pydantic==2.7.3
 pydantic_core==2.18.4
 docarray==0.40.0
+python-dotenv==1.0.0
+dill
