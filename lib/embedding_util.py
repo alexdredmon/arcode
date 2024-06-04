@@ -7,6 +7,9 @@ from langchain.schema import Document
 from lib.file_util import is_binary_file, is_ignored
 from config import API_KEY
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module='pydantic')
+
 EMBEDDING_MODEL = "text-embedding-3-small"
 
 def get_top_relevant_files(startpath, ignore_patterns, query, num_files=42):
