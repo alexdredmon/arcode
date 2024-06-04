@@ -10,13 +10,15 @@ import pyperclip
 from config import API_KEY
 from lib.argument_parser import parse_arguments
 from lib.gitignore_parser import parse_gitignore
-from lib.file_util import print_tree, print_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters, calculate_line_difference
+from lib.file_util import print_tree, get_files, format_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters, calculate_line_difference
 from lib.openai_client import create_openai_client, AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE
 from lib.shell_util import (
     LIGHT_PINK, LIGHT_GREEN, LIGHT_RED, LIGHT_BLUE, RESET_COLOR, WHITE_ON_DARK_BLUE, BLACK_ON_WHITE,
     WHITE_ON_BLACK
 )
 from lib.file_writer import write_files
+
+from lib.embedding_util import get_top_relevant_files
 
 def main():
     args = parse_arguments()
@@ -28,25 +30,36 @@ def main():
 
     ignore_patterns = parse_gitignore(os.path.join(args.dir, '.gitignore'))
 
+    if not API_KEY:
+        raise ValueError("API_KEY is not set")
+
+    file_contents = None
+    startpath = args.dir
+
+    if args.focused:
+        files = get_top_relevant_files(
+            startpath=startpath,
+            ignore_patterns=ignore_patterns,
+            query=requirements,
+            num_files=42
+        )
+    else:
+        files = get_files(startpath, ignore_patterns)
+
     f = io.StringIO()
     with redirect_stdout(f):
         print(AUTODEV_PROMPT_PRE)
-
-        startpath = args.dir
 
         print("Directory Tree:")
         print_tree(startpath, ignore_patterns)
 
         print("\nFile Contents:")
-        print_file_contents(startpath, ignore_patterns)
+        print(format_file_contents(files))
 
         autodev_prompt_post = AUTODEV_PROMPT_POST_TEMPLATE.format(requirements=requirements)
         print(autodev_prompt_post)
-
-    USER_CONTENT = f.getvalue()
-
-    if not API_KEY:
-        raise ValueError("API_KEY is not set")
+        
+        USER_CONTENT = f.getvalue()
 
     print(f"\n{WHITE_ON_BLACK} 🏗️  {BLACK_ON_WHITE} BUILDING FEATURE(S): {RESET_COLOR}\n{LIGHT_BLUE}{requirements}{RESET_COLOR}")
 
@@ -122,7 +135,6 @@ def main():
     else:
         write_files(files, args.dir)
         print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")
-    
 
 if __name__ == "__main__":
     main()

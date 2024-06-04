@@ -1,3 +1,5 @@
 inquirerpy==0.3.4
 openai==1.30.5
 pyperclip==1.8.2
+langchain==0.0.98
+langchain[docarray]

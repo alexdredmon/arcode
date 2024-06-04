@@ -43,18 +43,30 @@ def print_tree(startpath, ignore_patterns, prefix=''):
         for f in files:
             print(f'{prefix}{subindent}{f}')
 
-def print_file_contents(startpath, ignore_patterns):
+def format_file_contents(files):
+    contents = ""
+    for file in files:
+        file_path = file["path"]
+        contents += f"\n**************** FILE: {file_path} ****************\n"
+        contents += file["data"]
+        contents += f"\n**************** EOF: {file_path} ****************\n"
+    return contents
+
+def get_files(startpath, ignore_patterns):
+    all_files = []
     for root, _, files in os.walk(startpath):
         files = [f for f in files if not is_ignored(os.path.relpath(os.path.join(root, f), startpath), ignore_patterns) and not is_binary_file(f)]
         for f in files:
             file_path = os.path.relpath(os.path.join(root, f), startpath)
-            print(f"**************** FILE: {file_path} ****************")
             try:
                 with open(os.path.join(root, f), 'r', encoding='utf-8', errors='ignore') as file:
-                    print(file.read())
+                    all_files.append({
+                        "path": file_path,
+                        "data": file.read(),
+                    })
             except UnicodeDecodeError as e:
                 print(f"Error reading file {file_path}: {e}")
-            print(f"**************** EOF: {file_path} ****************")
+    return all_files
 
 def parse_files(string):
     pattern = re.compile(
