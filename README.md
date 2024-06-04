@@ -7,6 +7,15 @@ AI coding agent
 
 Codey is a command-line tool designed to facilitate holistic software development via LLM. It allows users generate feature implementations for a given codebase based on user-defined requirements.
 
+## Demo
+![Demo Animation](media/demo.gif)
+
+### Provide your requirements:
+![Demo 1](media/demo1.jpg)
+
+### Review and approve changes:
+![Demo 2](media/demo2.jpg)
+
 ## Features
 
 - Output modified files and a summary of changes required to implement the requested features.
