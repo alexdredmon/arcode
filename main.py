@@ -14,7 +14,7 @@ from lib.file_util import print_tree, get_files, format_file_contents, is_binary
 from lib.openai_client import create_openai_client, AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE
 from lib.shell_util import (
     LIGHT_PINK, LIGHT_GREEN, LIGHT_RED, LIGHT_BLUE, RESET_COLOR, WHITE_ON_DARK_BLUE, BLACK_ON_WHITE,
-    WHITE_ON_BLACK
+    WHITE_ON_BLACK, LIGHT_ORANGE, BLACK_BACKGROUND
 )
 from lib.file_writer import write_files
 
@@ -43,6 +43,11 @@ def main():
             query=requirements,
             num_files=args.focused,
         )
+        print(f"\n{WHITE_ON_BLACK} 🔬 {BLACK_ON_WHITE} FOCUSING ON {args.focused} MOST RELAVENT FILES: {RESET_COLOR}")
+        for file in files:
+            path = file["path"]
+            score = round(file["score"], 2)
+            print(f" - {LIGHT_BLUE}{path} {LIGHT_GREEN}({score}){RESET_COLOR}")
     else:
         files = get_files(startpath, ignore_patterns)
 
@@ -80,7 +85,7 @@ def main():
     for chunk in completion:
         delta = chunk.choices[0].delta
         if hasattr(delta, "content") and delta.content is not None:
-            print(f"{LIGHT_PINK}{delta.content}{RESET_COLOR}", end="", flush=True)
+            print(f"{BLACK_BACKGROUND}{LIGHT_ORANGE}{delta.content}{RESET_COLOR}", end="", flush=True)
             streamed_response += delta.content
             response_chunks.append(delta.content)
 

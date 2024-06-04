@@ -9,7 +9,8 @@ from lib.file_util import is_binary_file, is_ignored
 from config import API_KEY
 from lib.checksum_util import calculate_directory_checksum
 from lib.shell_util import (
-    RESET_COLOR, BLACK_ON_WHITE, WHITE_ON_BLACK
+    RESET_COLOR, BLACK_ON_WHITE, WHITE_ON_BLACK,
+    LIGHT_PINK
 )
 
 import warnings
@@ -29,7 +30,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, num_files=42):
         cached_checksum = ""
 
     if os.path.exists(CACHE_FILENAME) and cached_checksum == current_checksum:
-        print(f"{WHITE_ON_BLACK} 📖 {BLACK_ON_WHITE} Reading from cache... {RESET_COLOR}")
+        print(f"{WHITE_ON_BLACK} 📖 {LIGHT_PINK} Reading from cache... {RESET_COLOR}")
         with open(CACHE_FILENAME, 'rb') as f:
             cache_data = pickle.load(f)
             documents = [Document(**doc) for doc in cache_data['documents']]
@@ -77,14 +78,14 @@ def get_top_relevant_files(startpath, ignore_patterns, query, num_files=42):
 
     # Performing similarity search
     similarities = db.similarity_search_with_score(query, k=num_files)
-
+    print(f"{WHITE_ON_BLACK} 🔎 {LIGHT_PINK} Sorting and filtering... {RESET_COLOR}")
     sorted_files = sorted([(doc.metadata['source'], score) for doc, score in similarities], key=lambda x: x[1], reverse=True)
     top_files = []
-    for file, _ in sorted_files[:num_files]:
+    for file, score in sorted_files[:num_files]:
         try:
             with open(file, 'r', encoding='utf-8') as f:
                 data = f.read()
-                top_files.append({'path': file, 'data': data})
+                top_files.append({'path': file, 'data': data, 'score': score})
         except UnicodeDecodeError:
             # Skip files that can't be read as UTF-8
             continue
