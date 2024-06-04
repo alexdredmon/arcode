@@ -18,7 +18,10 @@ Codey is a command-line tool designed to facilitate holistic software developmen
 
 ## Features
 
-- Output modified files and a summary of changes required to implement the requested features.
+- Provide requirements and get recommended changes
+- Single button press confirmation + implementation
+- Supplies context from your repo/local files
+- Optional limiting of file context based on relevancy to features
 
 ## Installation
 
