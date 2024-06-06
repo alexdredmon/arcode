@@ -7,6 +7,14 @@ AI coding agent
 
 Arcode is a command-line tool designed to facilitate holistic software development via LLM. It allows users generate feature implementations for a given codebase based on user-defined requirements.
 
+## Features
+
+- Provide requirements and get recommended changes
+- Single button press confirmation + implementation
+- Supplies context from your repo/local files
+- Optional limiting of file context based on relevancy to features
+- Support for various providers/models via LiteLLM
+
 ## Demo
 ![Demo Animation](media/demo.gif)
 
@@ -15,14 +23,6 @@ Arcode is a command-line tool designed to facilitate holistic software developme
 
 ### Review and approve changes:
 ![Demo 2](media/demo2.jpg)
-
-## Features
-
-- Provide requirements and get recommended changes
-- Single button press confirmation + implementation
-- Supplies context from your repo/local files
-- Optional limiting of file context based on relevancy to features
-- Support for various providers/models via LiteLLM
 
 ## Setup
 
