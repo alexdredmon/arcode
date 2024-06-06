@@ -1,11 +1,11 @@
 # arcode
-AI coding agent
-
 ![arcode logo](logo.png)
+
+A.I. driven development tool
 
 ## Description
 
-Arcode is a command-line tool designed to facilitate holistic software development via LLM. It allows users generate feature implementations for a given codebase based on user-defined requirements.
+Arcode is a command-line tool designed to help facilitate holistic software development via LLM. It allows users generate feature implementations for a given codebase based on user-defined requirements.
 
 ## Features
 
@@ -23,6 +23,31 @@ Arcode is a command-line tool designed to facilitate holistic software developme
 
 ### Review and approve changes:
 ![Demo 2](media/demo2.jpg)
+
+## Parameters:
+```bash
+positional arguments:
+  requirements       Requirements for features to build on the codebase.
+
+options:
+  -h, --help         show this help message and exit
+  --dir DIR          The working directory of the codebase, default to current directory.
+  --write WRITE      Whether or not to write the changeset immediately. If piping input to arcode, this defaults to true.
+  --focused FOCUSED  Enable focused mode to limit files based on relevancy using embeddings - accepts an integer containing number of files to limit
+                     context to.
+  --model MODEL      Specify the LLM provider/model to use with LiteLLM, default to openai/gpt-4o.
+````
+
+## Examples:
+Generate a feature plan based on the specified requirements:
+```bash
+python arcode.py --dir . "Implement authentication"
+````
+
+Use the tool with input from a file:
+```bash
+cat feature_requirements.txt | python arcode.py --dir ./my_codebase
+````
 
 ## Setup
 
@@ -61,33 +86,8 @@ Or if running .py version:
 python arcode.py "Build feature X"
 ```
 
-## Parameters:
-```bash
-positional arguments:
-  requirements       Requirements for features to build on the codebase.
-
-options:
-  -h, --help         show this help message and exit
-  --dir DIR          The working directory of the codebase, default to current directory.
-  --write WRITE      Whether or not to write the changeset immediately. If piping input to arcode, this defaults to true.
-  --focused FOCUSED  Enable focused mode to limit files based on relevancy using embeddings - accepts an integer containing number of files to limit
-                     context to.
-  --model MODEL      Specify the LLM provider/model to use with LiteLLM, default to openai/gpt-4o.
-````
-
-## Examples:
-Generate a feature plan based on the specified requirements:
-```bash
-python arcode.py --dir . "Implement authentication"
-````
-
-Use the tool with input from a file:
-```bash
-cat feature_requirements.txt | python arcode.py --dir ./my_codebase
-````
-
 ## Configuration
-Ensure `OPENAI_API_KEY` is set as an environment variable and/or update the default value for `API_KEY` in `config.py`.
+Ensure `OPENAI_API_KEY` is set as an environment variable and/or update the default value for `API_KEY` in `.env` / `config.py`.
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for more details.
