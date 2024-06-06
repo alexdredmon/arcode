@@ -1,4 +1,3 @@
-from openai import OpenAI
 
 AUTODEV_PROMPT_PRE = """
 You are a software development team. I'm going to provide you with your codebase, then we'll build some features.
@@ -41,6 +40,3 @@ print("Hello world")
 # Just another demo file
 ===.= ==== EOF: lib/demofile2.py = ===== =========
 """
-
-def create_openai_client(api_key):
-    return OpenAI(api_key=api_key)

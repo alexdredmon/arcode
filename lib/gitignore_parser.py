@@ -16,6 +16,6 @@ def parse_gitignore(gitignore_path):
 
 def is_ignored(path, ignore_patterns):
     for pattern in ignore_patterns:
-        if path.startswith(pattern) or path.startswith(f"./{pattern}"):
+        if path.startswith(pattern) or path.startswith(f"./{pattern}") or f"/{pattern}/" in path:
             return True
     return False

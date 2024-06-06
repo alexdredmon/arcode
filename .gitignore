@@ -5,3 +5,5 @@ venv
 .codey.cache.pkl
 .codey.checksum.txt
 .env
+build
+dist

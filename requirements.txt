@@ -11,3 +11,4 @@ pydantic_core==2.18.4
 docarray==0.40.0
 python-dotenv==1.0.0
 dill
+litellm==1.0.0

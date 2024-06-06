@@ -11,7 +11,8 @@ from config import API_KEY
 from lib.argument_parser import parse_arguments
 from lib.gitignore_parser import parse_gitignore
 from lib.file_util import print_tree, get_files, format_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters, calculate_line_difference
-from lib.openai_client import create_openai_client, AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE
+from lib.prompt_templates import AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE
+from lib.litellm_client import create_litellm_client
 from lib.shell_util import (
     LIGHT_PINK, LIGHT_GREEN, LIGHT_RED, LIGHT_BLUE, RESET_COLOR, WHITE_ON_DARK_BLUE, BLACK_ON_WHITE,
     WHITE_ON_BLACK, LIGHT_ORANGE, BLACK_BACKGROUND
@@ -68,26 +69,20 @@ def main():
 
     print(f"\n{WHITE_ON_BLACK} 🏗️  {BLACK_ON_WHITE} BUILDING FEATURE(S): {RESET_COLOR}\n{LIGHT_BLUE}{requirements}{RESET_COLOR}")
 
-    client = create_openai_client(API_KEY)
-    completion = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": USER_CONTENT}
-        ],
-        stream=True
-    )
+    client = create_litellm_client()
+    completion = client(model=args.model, messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": USER_CONTENT}], stream=True)
 
     print(f"\n{WHITE_ON_BLACK} 🌐 {BLACK_ON_WHITE} STREAMING RESPONSE: {RESET_COLOR}")
     streamed_response = ""
     response_chunks = []
 
     for chunk in completion:
-        delta = chunk.choices[0].delta
-        if hasattr(delta, "content") and delta.content is not None:
-            print(f"{BLACK_BACKGROUND}{LIGHT_ORANGE}{delta.content}{RESET_COLOR}", end="", flush=True)
-            streamed_response += delta.content
-            response_chunks.append(delta.content)
+        if chunk and chunk.choices and chunk.choices[0] and chunk.choices[0].delta:
+            delta = chunk.choices[0].delta
+            if delta.get('content'):
+                print(f"{BLACK_BACKGROUND}{LIGHT_ORANGE}{delta['content']}{RESET_COLOR}", end="", flush=True)
+                streamed_response += delta['content']
+                response_chunks.append(delta['content'])
 
     files = parse_files(streamed_response)
     if sys.stdin.isatty():
