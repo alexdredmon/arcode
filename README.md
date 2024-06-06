@@ -22,6 +22,7 @@ Arcode is a command-line tool designed to facilitate holistic software developme
 - Single button press confirmation + implementation
 - Supplies context from your repo/local files
 - Optional limiting of file context based on relevancy to features
+- Support for various providers/models via LiteLLM
 
 ## Setup
 
