@@ -1,7 +1,7 @@
 # arcode
 AI coding agent
 
-![arcode logo](logo.jpg)
+![arcode logo](logo.png)
 
 ## Description
 
