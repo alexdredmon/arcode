@@ -67,21 +67,9 @@ cat feature_requirements.txt | python arcode.py --dir ./my_codebase
     export OPENAI_API_KEY=<your_openai_api_key>
     ```
 
-## Build
-
-Build a self-contained binary using PyInstaller:
-```bash
-pip install pyinstaller
-pyinstaller --onefile arcode.py
-```
-
 ## Usage
 
 Run Arcode with the following command:
-```bash
-arcode "Build feature X"
-```
-Or if running .py version:
 ```bash
 python arcode.py "Build feature X"
 ```
