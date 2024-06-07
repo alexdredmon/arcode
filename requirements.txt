@@ -13,3 +13,4 @@ python-dotenv==1.0.0
 dill==0.3.6
 litellm==1.40.0
 tiktoken
+pyinstaller==5.7.0

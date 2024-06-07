@@ -39,14 +39,14 @@ options:
 ````
 
 ## Examples:
-Generate a feature plan based on the specified requirements:
+Generate a plan and optionally write the changes based on requirements requirements:
 ```bash
-python arcode.py --dir . "Implement authentication"
+arcode "Implement authentication"
 ````
 
-Use the tool with input from a file:
+Use with input from a file:
 ```bash
-cat feature_requirements.txt | python arcode.py --dir ./my_codebase
+cat feature_requirements.txt | arcode --dir ./my_codebase
 ````
 
 ## Setup
@@ -56,21 +56,49 @@ cat feature_requirements.txt | python arcode.py --dir ./my_codebase
     git clone https://github.com/alexdredmon/arcode
     cd arcode
     ```
+2. Create & activate virtual environment:
+    ```bash
+    virtualenv venv
+    source venv/bin/activate
+    ```
 
-2. Install the required dependencies:
+3. Install the required dependencies:
     ```bash
     pip install -r requirements.txt
     ```
 
-3. Set up your OpenAI API key:
+4. Set your OpenAI API key:
     ```bash
     export OPENAI_API_KEY=<your_openai_api_key>
+    ```
+    or alternatively set in a .env file:
+    ```bash
+    OPENAI_API_KEY=<your_openai_api_key>
+    ```
+
+## Build
+
+1. Build a standalone executable via:
+
+    ```bash
+    ./build.sh
+    ```
+
+2. A binary will be created in `./dist/arcode/arcode`
+3. Add the resulting binary to your PATH to run it anywhere:
+    ```bash
+    export PATH="/Users/yourusername/path/to/dist/arcode:$PATH"
     ```
 
 ## Usage
 
-Run Arcode with the following command:
+Run Arcode with and pass it your requirements:
 ```bash
+arcode "Build feature X"
+```
+Or if you're running the .py version, run with one of the following:
+```bash
+./arcode.py "Build feature X"
 python arcode.py "Build feature X"
 ```
 
