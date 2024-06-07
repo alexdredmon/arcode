@@ -6,8 +6,8 @@ source venv-build/bin/activate
 
 pip install -r requirements.txt
 
-pyinstaller pyinstaller.spec --clean --noconfirm
+pyinstaller arcode.spec --clean --noconfirm
 
 deactivate
 
-# rm -rf venv-build
+rm -rf venv-build
