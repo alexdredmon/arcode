@@ -6,7 +6,7 @@ from langchain_community.vectorstores import DocArrayInMemorySearch
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.schema import Document
 from lib.file_util import is_binary_file, is_ignored
-from config import API_KEY
+from config import OPENAI_API_KEY
 from lib.checksum_util import calculate_directory_checksum
 from lib.shell_util import (
     RESET_COLOR, BLACK_ON_WHITE, WHITE_ON_BLACK,
@@ -34,7 +34,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, num_files=42):
         with open(CACHE_FILENAME, 'rb') as f:
             cache_data = pickle.load(f)
             documents = [Document(**doc) for doc in cache_data['documents']]
-            embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
+            embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
             db = DocArrayInMemorySearch.from_documents(documents, embeddings)
     else:
         file_contents = []
@@ -63,7 +63,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, num_files=42):
         text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=20)
         docs = text_splitter.split_documents(file_contents)
 
-        embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
+        embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
         db = DocArrayInMemorySearch.from_documents(docs, embeddings)
 
         cache_data = {

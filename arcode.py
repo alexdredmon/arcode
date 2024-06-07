@@ -6,12 +6,13 @@ import io
 from contextlib import redirect_stdout
 from InquirerPy import prompt
 import pyperclip
+from litellm.llms.openai import OpenAIError
 
-from config import API_KEY
+from config import OPENAI_API_KEY
 from lib.argument_parser import parse_arguments
 from lib.gitignore_parser import parse_gitignore
 from lib.file_util import print_tree, get_files, format_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters, calculate_line_difference
-from lib.prompt_templates import AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE
+from lib.prompt_templates import AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE, QUESTION_PROMPT_PRE, QUESTION_PROMPT_POST_TEMPLATE
 from lib.litellm_client import create_litellm_client
 from lib.shell_util import (
     LIGHT_PINK, LIGHT_GREEN, LIGHT_RED, LIGHT_BLUE, RESET_COLOR, WHITE_ON_DARK_BLUE, BLACK_ON_WHITE,
@@ -31,8 +32,8 @@ def main():
 
     ignore_patterns = parse_gitignore(os.path.join(args.dir, '.gitignore'))
 
-    if not API_KEY:
-        raise ValueError("API_KEY is not set")
+    if not OPENAI_API_KEY:
+        raise ValueError("OPENAI_API_KEY is not set")
 
     file_contents = None
     startpath = args.dir
@@ -44,17 +45,21 @@ def main():
             query=requirements,
             num_files=args.focused,
         )
-        print(f"\n{WHITE_ON_BLACK} 🔬 {BLACK_ON_WHITE} FOCUSING ON {args.focused} MOST RELAVENT FILES: {RESET_COLOR}")
+        print(f"\n{WHITE_ON_BLACK} 🔬 {BLACK_ON_WHITE} FOCUSING ON {args.focused} MOST RELEVANT FILES: {RESET_COLOR}")
         for file in files:
             path = file["path"]
             score = round(file["score"], 2)
-            print(f" - {LIGHT_BLUE}{path} {LIGHT_GREEN}({score}){RESET_COLOR}")
+            score_viz = '[' + (int(score * 10) * '🟩') + ((10 - int(score * 10)) * '⬛️') + ']'
+            print(f" - {score_viz} {LIGHT_BLUE}{path} {LIGHT_GREEN}({score}){RESET_COLOR}")
     else:
         files = get_files(startpath, ignore_patterns)
 
     f = io.StringIO()
     with redirect_stdout(f):
-        print(AUTODEV_PROMPT_PRE)
+        if args.mode == "question":
+            print(QUESTION_PROMPT_PRE)
+        else:
+            print(AUTODEV_PROMPT_PRE)
 
         print("Directory Tree:")
         print_tree(startpath, ignore_patterns)
@@ -62,76 +67,97 @@ def main():
         print("\nFile Contents:")
         print(format_file_contents(files))
 
-        autodev_prompt_post = AUTODEV_PROMPT_POST_TEMPLATE.format(requirements=requirements)
-        print(autodev_prompt_post)
-        
+        if args.mode == "question":
+            prompt_post = QUESTION_PROMPT_POST_TEMPLATE.format(requirements=requirements)
+        else:
+            prompt_post = AUTODEV_PROMPT_POST_TEMPLATE.format(requirements=requirements)
+
+        print(prompt_post)
+
         USER_CONTENT = f.getvalue()
 
     print(f"\n{WHITE_ON_BLACK} 🏗️  {BLACK_ON_WHITE} BUILDING FEATURE(S): {RESET_COLOR}\n{LIGHT_BLUE}{requirements}{RESET_COLOR}")
 
+    answers = {
+        "next_step": None
+    }
+    messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": USER_CONTENT}]
+
     client = create_litellm_client()
-    completion = client(model=args.model, messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": USER_CONTENT}], stream=True)
 
-    print(f"\n{WHITE_ON_BLACK} 🌐 {BLACK_ON_WHITE} STREAMING RESPONSE: {RESET_COLOR}")
-    streamed_response = ""
-    response_chunks = []
+    while answers["next_step"] != "🚪 Exit":
+        try:
+            completion = client(model=args.model, messages=messages, stream=True)
 
-    for chunk in completion:
-        if chunk and chunk.choices and chunk.choices[0] and chunk.choices[0].delta:
-            delta = chunk.choices[0].delta
-            if delta.get('content'):
-                print(f"{BLACK_BACKGROUND}{LIGHT_ORANGE}{delta['content']}{RESET_COLOR}", end="", flush=True)
-                streamed_response += delta['content']
-                response_chunks.append(delta['content'])
+            print(f"\n{WHITE_ON_BLACK} 🌐 {BLACK_ON_WHITE} STREAMING RESPONSE: {RESET_COLOR}")
+            streamed_response = ""
+            response_chunks = []
 
-    files = parse_files(streamed_response)
-    if sys.stdin.isatty():
-        choices = ['Write changeset to files', 'Copy full response']
-        for file in files:
-            filename = file["filename"]
-            choices.append(f"Copy file {filename}")
+            for chunk in completion:
+                if chunk and chunk.choices and chunk.choices[0] and chunk.choices[0].delta:
+                    delta = chunk.choices[0].delta
+                    if delta.get('content'):
+                        print(f"{BLACK_BACKGROUND}{LIGHT_ORANGE}{delta['content']}{RESET_COLOR}", end="", flush=True)
+                        streamed_response += delta['content']
+                        response_chunks.append(delta['content'])
 
-        # Print file changes
-        for file in files:
-            filename = file["filename"]
-            new_content = file["contents"]
-            line_diff = calculate_line_difference(os.path.join(args.dir, filename), new_content)
-            line_diff_str = f"{LIGHT_GREEN}{filename} ({line_diff:+d}){RESET_COLOR}"
-            print(f"\n\n{WHITE_ON_BLACK} 📁 {BLACK_ON_WHITE} FILES TO UPDATE: {RESET_COLOR}")
-            print(line_diff_str)
-            print("")
+        except OpenAIError as e:
+            print(f"{BLACK_BACKGROUND}{LIGHT_RED}{e.message}{RESET_COLOR}")
+            break
 
-        choices.append("Exit")
+        files = parse_files(streamed_response)
+        if sys.stdin.isatty():
+            choices = ['💬 Followup prompt', '🏗️  Write changeset to files', '📑 Copy full response']
+            for file in files:
+                filename = file["filename"]
+                choices.append(f"📄 Copy file {filename}")
 
-        answers = {
-            "next_step": None
-        }
-        questions = [
-            {
-                'type': 'list',
-                'name': 'next_step',
-                'message': '↕',
-                'choices': choices,
-            }
-        ]
+            # Print file changes
+            for file in files:
+                filename = file["filename"]
+                new_content = file["contents"]
+                line_diff = calculate_line_difference(os.path.join(args.dir, filename), new_content)
+                line_diff_str = f"{LIGHT_GREEN}{filename} ({line_diff:+d}){RESET_COLOR}"
+                print(f"\n\n{WHITE_ON_BLACK} 📁 {BLACK_ON_WHITE} FILES TO UPDATE: {RESET_COLOR}")
+                print(line_diff_str)
+                print("")
 
-        print(f"{WHITE_ON_BLACK} ⚡️ {BLACK_ON_WHITE} ACTION: {RESET_COLOR}")
-        while answers["next_step"] != "Exit":
-            answers = prompt(questions)
+            choices.append("🚪 Exit")
+            if args.mode == "question":
+                choices = ["🚪 Exit"]
 
-            if answers['next_step'] == 'Copy full response':
-                pyperclip.copy(streamed_response)
-                print("Response copied to clipboard.")
+            questions = [
+                {
+                    'type': 'list',
+                    'name': 'next_step',
+                    'message': '↕',
+                    'choices': choices,
+                }
+            ]
 
-            elif answers['next_step'].startswith("Copy file "):
-                for file in files:
-                    filename = file["filename"]
-                    if answers['next_step'] == f"Copy file {filename}":
-                        pyperclip.copy(file["contents"])
+            print(f"{WHITE_ON_BLACK} ⚡️ {BLACK_ON_WHITE} ACTION: {RESET_COLOR}")
+            exit_menu = False
+            while not exit_menu:
+                answers = prompt(questions)
 
-            elif answers['next_step'] == 'Write changeset to files':
-                write_files(files, args.dir)
-                print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")
+                if answers['next_step'] == '📑 Copy full response':
+                    pyperclip.copy(streamed_response)
+                    print("Response copied to clipboard.")
+                elif answers['next_step'].startswith("📄 Copy file "):
+                    for file in files:
+                        filename = file["filename"]
+                        if answers['next_step'] == f"📄 Copy file {filename}":
+                            pyperclip.copy(file["contents"])
+                elif answers['next_step'] == '🏗️  Write changeset to files':
+                    write_files(files, args.dir)
+                    print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")
+                elif answers['next_step'] == "💬 Followup prompt":
+                    followup = input(">")
+                    messages.append({"role": "assistant", "content": streamed_response})
+                    messages.append({"role": "user", "content": followup})
+                    exit_menu = True
+                elif answers['next_step'] == "🚪 Exit":
+                    exit_menu = True
     else:
         write_files(files, args.dir)
         print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")

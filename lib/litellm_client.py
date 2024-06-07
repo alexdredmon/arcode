@@ -1,8 +1,9 @@
 from litellm import completion
-from config import API_KEY
+from litellm.llms.openai import OpenAIError
+from config import OPENAI_API_KEY
 
 
 def create_litellm_client():
-    if not API_KEY:
-        raise ValueError("API_KEY is not set")
+    if not OPENAI_API_KEY:
+        raise ValueError("OPENAI_API_KEY is not set")
     return completion

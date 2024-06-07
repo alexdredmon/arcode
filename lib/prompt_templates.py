@@ -1,4 +1,3 @@
-
 AUTODEV_PROMPT_PRE = """
 You are a software development team. I'm going to provide you with your codebase, then we'll build some features.
 
@@ -39,4 +38,12 @@ print("Hello world")
 ===.= ==== FILENAME: lib/demofile2.py = ===== =========
 # Just another demo file
 ===.= ==== EOF: lib/demofile2.py = ===== =========
+"""
+
+QUESTION_PROMPT_PRE = """
+You are a principle software architect and I am going to ask you a question about my codebase. Do not try to make any implementation suggestions unless explicitly requested. Here is my codebase:
+"""
+
+QUESTION_PROMPT_POST_TEMPLATE = """
+That's my codebase - please answer my question: {requirements}
 """
