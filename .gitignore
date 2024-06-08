@@ -4,6 +4,7 @@ venv
 .DS_Store
 .arcode.cache.pkl
 .arcode.checksum.txt
+.arcode.embeddings
 .env
 build
 dist

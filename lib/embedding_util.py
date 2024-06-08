@@ -12,12 +12,15 @@ from lib.shell_util import (
     LIGHT_PINK
 )
 from lib.litellm_client import create_litellm_client_embeddings
+from langchain.embeddings import CacheBackedEmbeddings
+from langchain.storage import LocalFileStore
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module='pydantic')
 
 CACHE_FILENAME = ".arcode.cache.pkl"
 CHECKSUM_FILENAME = ".arcode.checksum.txt"
+EMBEDDINGS_CACHE_DIR = ".arcode.embeddings"
 
 def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, num_files=42):
     api_base = None
@@ -28,6 +31,12 @@ def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, n
         api_key = get_api_keys(model_embedding)
 
     current_checksum = calculate_directory_checksum(startpath, ignore_patterns)
+
+    store = LocalFileStore(f"{startpath}/{EMBEDDINGS_CACHE_DIR}/")
+    embeddings = create_litellm_client_embeddings(model=model_embedding, api_key=api_key, api_base=api_base, api_version=api_version)
+    cached_embedder = CacheBackedEmbeddings.from_bytes_store(
+        embeddings, store, namespace=embeddings.model
+    )
 
     if os.path.exists(CHECKSUM_FILENAME):
         with open(CHECKSUM_FILENAME, 'r') as f:
@@ -40,8 +49,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, n
         with open(CACHE_FILENAME, 'rb') as f:
             cache_data = pickle.load(f)
             documents = [Document(**doc) for doc in cache_data['documents']]
-            embeddings = create_litellm_client_embeddings(model=model_embedding, api_key=api_key, api_base=api_base, api_version=api_version)
-            db = DocArrayInMemorySearch.from_documents(documents, embeddings)
+            db = DocArrayInMemorySearch.from_documents(documents, cached_embedder)
     else:
         file_contents = []
         files = []
@@ -69,8 +77,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, n
         text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=20)
         docs = text_splitter.split_documents(file_contents)
 
-        embeddings = create_litellm_client_embeddings(model=model_embedding, api_key=api_key, api_base=api_base, api_version=api_version)
-        db = DocArrayInMemorySearch.from_documents(docs, embeddings)
+        db = DocArrayInMemorySearch.from_documents(docs, cached_embedder)
 
         cache_data = {
             'documents': [doc.dict() for doc in docs]
