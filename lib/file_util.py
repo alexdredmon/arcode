@@ -66,6 +66,8 @@ def get_files(startpath, ignore_patterns):
                     })
             except UnicodeDecodeError as e:
                 print(f"Error reading file {file_path}: {e}")
+            except Exception as e:
+                print(f"Unknown error reading file: {file_path}: {e}")
     return all_files
 
 def parse_files(string):

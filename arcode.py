@@ -14,7 +14,7 @@ from lib.argument_parser import parse_arguments
 from lib.gitignore_parser import parse_gitignore
 from lib.file_util import print_tree, get_files, format_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters, calculate_line_difference
 from lib.prompt_templates import AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE, QUESTION_PROMPT_PRE, QUESTION_PROMPT_POST_TEMPLATE
-from lib.litellm_client import create_litellm_client
+from lib.litellm_client import create_litellm_client, calculate_token_count
 from lib.shell_util import (
     LIGHT_PINK, LIGHT_GREEN, LIGHT_RED, LIGHT_BLUE, RESET_COLOR, WHITE_ON_DARK_BLUE, BLACK_ON_WHITE,
     WHITE_ON_BLACK, LIGHT_ORANGE, BLACK_BACKGROUND
@@ -100,6 +100,10 @@ def main():
 
     client = create_litellm_client(args.model)
 
+    # Calculate and print token count using tiktoken
+    total_token_count = calculate_token_count(args.model, messages, args.token_encoding)
+    print(f"\n{WHITE_ON_BLACK} 🔢 {BLACK_ON_WHITE} TOTAL TOKEN COUNT: {RESET_COLOR} {total_token_count}\n")
+
     while answers["next_step"] != "🚪 Exit":
         try:
             completion = client(model=args.model, messages=messages, stream=True)
@@ -161,7 +165,7 @@ def main():
                 if answers['next_step'] == '📑 Copy full response':
                     pyperclip.copy(streamed_response)
                     print("Response copied to clipboard.")
-                elif answers['next_step'].startswith("📄 Copy file "):
+                elif answers['next_step'].startsWith("📄 Copy file "):
                     for file in files:
                         filename = file["filename"]
                         if answers['next_step'] == f"📄 Copy file {filename}":

@@ -1,3 +1,4 @@
+import tiktoken
 from litellm import completion, embedding
 from config import get_api_keys
 
@@ -33,3 +34,10 @@ def create_litellm_client(model):
 
 def create_litellm_client_embeddings(model, api_key, api_base=None, api_version=None):
     return LitellmEmbeddings(model, api_key, api_base, api_version)
+
+def calculate_token_count(model, messages, encoding):
+
+    encoding = tiktoken.get_encoding(encoding)
+    
+    total_tokens = sum(len(encoding.encode(message['content'])) for message in messages)
+    return total_tokens
