@@ -45,7 +45,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, n
         cached_checksum = ""
 
     if os.path.exists(CACHE_FILENAME) and cached_checksum == current_checksum:
-        print(f"{WHITE_ON_BLACK} 📖 {LIGHT_PINK} Reading from cache... {RESET_COLOR}")
+        print(f"{WHITE_ON_BLACK} 📖 {LIGHT_PINK} READING CACHE... {RESET_COLOR}\n")
         with open(CACHE_FILENAME, 'rb') as f:
             cache_data = pickle.load(f)
             documents = [Document(**doc) for doc in cache_data['documents']]
@@ -83,7 +83,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, n
             'documents': [doc.dict() for doc in docs]
         }
 
-        print(f"{WHITE_ON_BLACK} 📖 {BLACK_ON_WHITE} Writing cache... {RESET_COLOR}")
+        print(f"{WHITE_ON_BLACK} 📖 {BLACK_ON_WHITE} WRITING CACHE... {RESET_COLOR}\n")
         with open(CACHE_FILENAME, 'wb') as f:
             pickle.dump(cache_data, f)
         with open(CHECKSUM_FILENAME, 'w') as f:

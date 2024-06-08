@@ -36,21 +36,25 @@ def main():
 
     ignore_patterns = parse_gitignore(os.path.join(args.dir, '.gitignore'), args.ignore)
 
-    print(f"\n{WHITE_ON_BLACK} ⚙️  {BLACK_ON_WHITE} CONFIGURATION: {RESET_COLOR}")
-    print(f"{LIGHT_PINK}       Config file: {LIGHT_BLUE}{args.config_from_file}{RESET_COLOR}")
-    print(f"{LIGHT_PINK}         Directory: {LIGHT_BLUE}{args.dir}{RESET_COLOR}")
-    print(f"{LIGHT_PINK}             Model: {LIGHT_BLUE}{args.model}{RESET_COLOR}")
-    print(f"{LIGHT_PINK}   Embedding Model: {LIGHT_BLUE}{args.model_embedding}{RESET_COLOR}")
-    print(f"{LIGHT_PINK}        Auto-write: {LIGHT_BLUE}{args.autowrite}{RESET_COLOR}")
-    print(f"{LIGHT_PINK}           Focused: {LIGHT_BLUE}{args.focused}{RESET_COLOR}")
-    print(f"{LIGHT_PINK}            Ignore: {LIGHT_BLUE}{args.ignore}{RESET_COLOR}")
-    print(f"{LIGHT_PINK}              Mode: {LIGHT_BLUE}{args.mode}{RESET_COLOR}")
-
     # Validate and fetch the API keys for the provided model
     api_keys = get_api_keys(args.model)
 
     file_contents = None
     startpath = args.dir
+
+    print(f"\n{WHITE_ON_BLACK} 🏗️  {BLACK_ON_WHITE} BUILDING FEATURE(S): {RESET_COLOR}")
+    print(f"    {LIGHT_PINK}> {LIGHT_BLUE}{requirements}{RESET_COLOR}")
+
+    print(f"\n{WHITE_ON_BLACK} ⚙️  {BLACK_ON_WHITE} CONFIGURATION: {RESET_COLOR}")
+    print(f"{LIGHT_PINK}        Config file: {LIGHT_BLUE}{args.config_from_file}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}          Directory: {LIGHT_BLUE}{args.dir}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}              Model: {LIGHT_BLUE}{args.model}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}    Embedding Model: {LIGHT_BLUE}{args.model_embedding}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}     Token Encoding: {LIGHT_BLUE}{args.token_encoding}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}         Auto-write: {LIGHT_BLUE}{args.autowrite}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}            Focused: {LIGHT_BLUE}{args.focused}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}             Ignore: {LIGHT_BLUE}{args.ignore}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}               Mode: {LIGHT_BLUE}{args.mode}{RESET_COLOR}")
 
     if args.focused:
         files = get_top_relevant_files(
@@ -95,8 +99,6 @@ def main():
 
         USER_CONTENT = f.getvalue()
 
-    print(f"\n{WHITE_ON_BLACK} 🏗️  {BLACK_ON_WHITE} BUILDING FEATURE(S): {RESET_COLOR}\n{LIGHT_BLUE}{requirements}{RESET_COLOR}")
-
     answers = {
         "next_step": None
     }
@@ -104,10 +106,10 @@ def main():
 
     client = create_litellm_client(args.model)
 
-    # Calculate and print token count using tiktoken
-    total_token_count = calculate_token_count(args.model, messages, args.token_encoding)
-    print(f"\n{WHITE_ON_BLACK} 🧮 {BLACK_ON_WHITE} REQUEST TOKEN COUNT: {RESET_COLOR} {total_token_count}\n")
-
+    input_tokens, output_tokens, total_tokens = calculate_token_count(args.model, messages, args.token_encoding)
+    print(f"\n{WHITE_ON_BLACK} 🧮 {BLACK_ON_WHITE} TOKENS ({total_tokens:,} total) [{args.token_encoding}]{RESET_COLOR}")
+    print(f"     {LIGHT_PINK}In: {LIGHT_BLUE}{input_tokens:,}{RESET_COLOR}")
+    print(f"    {LIGHT_PINK}Out: {LIGHT_BLUE}{output_tokens:,}{RESET_COLOR}\n")
     while answers["next_step"] != "🚪 Exit":
         try:
             completion = client(model=args.model, messages=messages, stream=True)
@@ -129,6 +131,8 @@ def main():
             break
 
         files = parse_files(streamed_response)
+        messages.append({"role": "assistant", "content": streamed_response})
+
         if sys.stdin.isatty():
             choices = ['💬 Followup prompt', '🏗️  Write changeset to files', '📑 Copy full response']
             for file in files:
@@ -157,6 +161,11 @@ def main():
                     'choices': choices,
                 }
             ]
+            
+            input_tokens, output_tokens, total_tokens = calculate_token_count(args.model, messages, args.token_encoding)
+            print(f"\n{WHITE_ON_BLACK} 🧮 {BLACK_ON_WHITE} TOKENS ({total_tokens:,} total) [{args.token_encoding}]{RESET_COLOR}")
+            print(f"     {LIGHT_PINK}In: {LIGHT_BLUE}{input_tokens:,}{RESET_COLOR}")
+            print(f"    {LIGHT_PINK}Out: {LIGHT_BLUE}{output_tokens:,}{RESET_COLOR}\n")
 
             print(f"{WHITE_ON_BLACK} ⚡️ {BLACK_ON_WHITE} ACTION: {RESET_COLOR}")
             exit_menu = False
@@ -179,7 +188,6 @@ def main():
                     print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")
                 elif answers['next_step'] == "💬 Followup prompt":
                     followup = input(">")
-                    messages.append({"role": "assistant", "content": streamed_response})
                     messages.append({"role": "user", "content": followup})
                     exit_menu = True
                 elif answers['next_step'] == "🚪 Exit":

@@ -38,6 +38,11 @@ def create_litellm_client_embeddings(model, api_key, api_base=None, api_version=
 def calculate_token_count(model, messages, encoding):
 
     encoding = tiktoken.get_encoding(encoding)
-    
-    total_tokens = sum(len(encoding.encode(message['content'])) for message in messages)
-    return total_tokens
+    total_input = 0
+    total_output = 0
+    for message in messages:
+        if message["role"] == "user":
+            total_input += len(encoding.encode(message['content']))
+        else:
+            total_output += len(encoding.encode(message['content']))
+    return total_input, total_output, total_input + total_output
