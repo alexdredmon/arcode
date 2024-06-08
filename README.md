@@ -1,8 +1,6 @@
 # arcode
 ![arcode logo](logo.png)
 
-A.I. driven development tool
-
 ## Description
 
 Arcode is a command-line tool designed to help facilitate holistic software development via LLM. It allows users generate feature implementations for a given codebase based on user-defined requirements.
@@ -36,20 +34,32 @@ options:
   --focused FOCUSED  Enable focused mode to limit files based on relevancy using embeddings - accepts an integer containing number of files to limit
                      context to.
   --model MODEL      Specify the LLM provider/model to use with LiteLLM, default to openai/gpt-4o.
-````
+```
 
 ## Examples:
 Generate a plan and optionally write the changes based on requirements requirements:
 ```bash
 arcode "Implement authentication"
-````
+```
 
 Use with input from a file:
 ```bash
 cat feature_requirements.txt | arcode --dir ./my_codebase
-````
+```
 
-## Setup
+## Install
+
+1. Ensure [Homebrew](https://brew.sh/) is installed
+2. Tap `alexdredmon/arcode`
+    ```bash
+    brew tap alexdredmon/arcode
+    ```
+3. Install arcode
+    ```bash
+    brew install arcode
+    ```
+
+## Development Setup
 
 1. Clone the repository:
     ```bash
@@ -88,6 +98,32 @@ cat feature_requirements.txt | arcode --dir ./my_codebase
 3. Add the resulting binary to your PATH to run it anywhere:
     ```bash
     export PATH="/Users/yourusername/path/to/dist/arcode:$PATH"
+    ```
+
+## Homebrew Installation
+
+To install Arcode via Homebrew:
+
+1. Clone the repository and navigate into the project directory:
+    ```bash
+    git clone https://github.com/alexdredmon/arcode
+    cd arcode
+    ```
+
+2. Run the build script to generate the standalone executable and Homebrew formula:
+    ```bash
+    ./build.sh
+    ```
+
+3. Move the generated formula into your local Homebrew formula directory:
+    ```bash
+    mkdir -p $(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/
+    cp Formula/arcode.rb $(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/
+    ```
+
+4. Install the formula:
+    ```bash
+    brew install arcode
     ```
 
 ## Usage

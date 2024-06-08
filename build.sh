@@ -11,3 +11,5 @@ pyinstaller arcode.spec --clean --noconfirm
 deactivate
 
 rm -rf venv-build
+
+shasum -a 256 "dist/arcode" | cut -d ' ' -f 1
