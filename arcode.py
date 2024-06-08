@@ -8,7 +8,7 @@ from InquirerPy import prompt
 import pyperclip
 from litellm.llms.openai import OpenAIError
 
-from config import OPENAI_API_KEY
+from config import get_api_keys
 from lib.argument_parser import parse_arguments
 from lib.gitignore_parser import parse_gitignore
 from lib.file_util import print_tree, get_files, format_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters, calculate_line_difference
@@ -32,8 +32,8 @@ def main():
 
     ignore_patterns = parse_gitignore(os.path.join(args.dir, '.gitignore'))
 
-    if not OPENAI_API_KEY:
-        raise ValueError("OPENAI_API_KEY is not set")
+    # Validate and fetch the API keys for the provided model
+    api_keys = get_api_keys(args.model)
 
     file_contents = None
     startpath = args.dir
@@ -44,6 +44,8 @@ def main():
             ignore_patterns=ignore_patterns,
             query=requirements,
             num_files=args.focused,
+            # model=args.model,
+            model_embedding=args.model_embedding
         )
         print(f"\n{WHITE_ON_BLACK} 🔬 {BLACK_ON_WHITE} FOCUSING ON {args.focused} MOST RELEVANT FILES: {RESET_COLOR}")
         for file in files:
@@ -83,7 +85,7 @@ def main():
     }
     messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": USER_CONTENT}]
 
-    client = create_litellm_client()
+    client = create_litellm_client(args.model)
 
     while answers["next_step"] != "🚪 Exit":
         try:
@@ -159,8 +161,9 @@ def main():
                 elif answers['next_step'] == "🚪 Exit":
                     exit_menu = True
     else:
-        write_files(files, args.dir)
-        print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")
+        if args.write:
+            write_files(files, args.dir)
+            print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")
 
 if __name__ == "__main__":
     main()

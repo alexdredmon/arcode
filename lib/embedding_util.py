@@ -1,26 +1,42 @@
 import os
 import dill as pickle  # Use dill instead of pickle
 from langchain_community.document_loaders import DirectoryLoader
-from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import DocArrayInMemorySearch
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.schema import Document
 from lib.file_util import is_binary_file, is_ignored
-from config import OPENAI_API_KEY
+from config import get_api_keys
 from lib.checksum_util import calculate_directory_checksum
 from lib.shell_util import (
     RESET_COLOR, BLACK_ON_WHITE, WHITE_ON_BLACK,
     LIGHT_PINK
 )
+from litellm import embedding
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module='pydantic')
 
-EMBEDDING_MODEL = "text-embedding-3-small"
-CACHE_FILENAME = ".codey.cache.pkl"
-CHECKSUM_FILENAME = ".codey.checksum.txt"
+CACHE_FILENAME = ".arcode.cache.pkl"
+CHECKSUM_FILENAME = ".arcode.checksum.txt"
 
-def get_top_relevant_files(startpath, ignore_patterns, query, num_files=42):
+class LitellmEmbeddings:
+    def __init__(self, model, api_key):
+        self.model = model
+        self.api_key = api_key
+
+    def embed_documents(self, texts):
+        response = embedding(model=self.model, input=texts, api_key=self.api_key)
+        embeddings = [item['embedding'] for item in response['data']]
+        return embeddings
+
+    def embed_query(self, query):
+        response = embedding(model=self.model, input=[query], api_key=self.api_key)
+        embedding_result = response['data'][0]['embedding']
+        return embedding_result
+
+def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, num_files=42):
+    api_key = get_api_keys(model_embedding)
+
     current_checksum = calculate_directory_checksum(startpath, ignore_patterns)
 
     if os.path.exists(CHECKSUM_FILENAME):
@@ -34,7 +50,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, num_files=42):
         with open(CACHE_FILENAME, 'rb') as f:
             cache_data = pickle.load(f)
             documents = [Document(**doc) for doc in cache_data['documents']]
-            embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+            embeddings = LitellmEmbeddings(model=model_embedding, api_key=api_key)
             db = DocArrayInMemorySearch.from_documents(documents, embeddings)
     else:
         file_contents = []
@@ -63,7 +79,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, num_files=42):
         text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=20)
         docs = text_splitter.split_documents(file_contents)
 
-        embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+        embeddings = LitellmEmbeddings(model=model_embedding, api_key=api_key)
         db = DocArrayInMemorySearch.from_documents(docs, embeddings)
 
         cache_data = {
