@@ -34,15 +34,16 @@ def main():
     else:
         requirements = ' '.join(args.requirements).strip()
 
-    ignore_patterns = parse_gitignore(os.path.join(args.dir, '.gitignore'))
+    ignore_patterns = parse_gitignore(os.path.join(args.dir, '.gitignore'), args.ignore)
 
-    print(f"\n{WHITE_ON_BLACK} ⚙️ {BLACK_ON_WHITE} CONFIGURATION: {RESET_COLOR}")
+    print(f"\n{WHITE_ON_BLACK} ⚙️  {BLACK_ON_WHITE} CONFIGURATION: {RESET_COLOR}")
     print(f"{LIGHT_PINK}       Config file: {LIGHT_BLUE}{args.config_from_file}{RESET_COLOR}")
     print(f"{LIGHT_PINK}         Directory: {LIGHT_BLUE}{args.dir}{RESET_COLOR}")
     print(f"{LIGHT_PINK}             Model: {LIGHT_BLUE}{args.model}{RESET_COLOR}")
     print(f"{LIGHT_PINK}   Embedding Model: {LIGHT_BLUE}{args.model_embedding}{RESET_COLOR}")
     print(f"{LIGHT_PINK}        Auto-write: {LIGHT_BLUE}{args.autowrite}{RESET_COLOR}")
     print(f"{LIGHT_PINK}           Focused: {LIGHT_BLUE}{args.focused}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}            Ignore: {LIGHT_BLUE}{args.ignore}{RESET_COLOR}")
     print(f"{LIGHT_PINK}              Mode: {LIGHT_BLUE}{args.mode}{RESET_COLOR}")
 
     # Validate and fetch the API keys for the provided model
@@ -57,19 +58,22 @@ def main():
             ignore_patterns=ignore_patterns,
             query=requirements,
             num_files=args.focused,
-            # model=args.model,
             model_embedding=args.model_embedding
         )
-        print(f"\n{WHITE_ON_BLACK} 🔬 {BLACK_ON_WHITE} FOCUSING ON {args.focused} MOST RELEVANT FILES: {RESET_COLOR}")
+        print(f"\n{WHITE_ON_BLACK} 🔬 {BLACK_ON_WHITE} FOCUSING ON {args.focused} MOST RELEVANT FILE CHUNKS: {RESET_COLOR}")
         for file in files:
             path = file["path"]
             score = round(file["score"], 2)
-            score_viz = '[' + (int(score * 10) * '🟩') + ((10 - int(score * 10)) * '⬛️') + ']'
-            print(f" - {score_viz} {LIGHT_BLUE}{path} {LIGHT_GREEN}({score}){RESET_COLOR}")
+            print(f"    {LIGHT_PINK}* {LIGHT_BLUE}{path} {LIGHT_GREEN}({score}){RESET_COLOR}")
     else:
         files = get_files(startpath, ignore_patterns)
 
     f = io.StringIO()
+    if not args.focused or args.focused < 1:
+        print(f"\n{WHITE_ON_BLACK} 📂 {BLACK_ON_WHITE} FILES FOUND: {RESET_COLOR}")
+        for file in files:
+            path = file["path"]
+            print(f"    {LIGHT_PINK}* {LIGHT_BLUE}{path}{RESET_COLOR}")
     with redirect_stdout(f):
         if args.mode == "question":
             print(QUESTION_PROMPT_PRE)
@@ -102,7 +106,7 @@ def main():
 
     # Calculate and print token count using tiktoken
     total_token_count = calculate_token_count(args.model, messages, args.token_encoding)
-    print(f"\n{WHITE_ON_BLACK} 🔢 {BLACK_ON_WHITE} TOTAL TOKEN COUNT: {RESET_COLOR} {total_token_count}\n")
+    print(f"\n{WHITE_ON_BLACK} 🧮 {BLACK_ON_WHITE} REQUEST TOKEN COUNT: {RESET_COLOR} {total_token_count}\n")
 
     while answers["next_step"] != "🚪 Exit":
         try:
@@ -165,7 +169,7 @@ def main():
                 if answers['next_step'] == '📑 Copy full response':
                     pyperclip.copy(streamed_response)
                     print("Response copied to clipboard.")
-                elif answers['next_step'].startsWith("📄 Copy file "):
+                elif answers['next_step'].startswith("📄 Copy file "):
                     for file in files:
                         filename = file["filename"]
                         if answers['next_step'] == f"📄 Copy file {filename}":

@@ -132,6 +132,10 @@ Sample `arcodeconf.yml`:
 ```yaml
 args:
   model: anthropic/claude-3-opus-20240229
+  ignore:
+    - build
+    - dist
+    - secrets
 env:
   ANTHROPIC_API_KEY: 3xampl3
 ```
@@ -139,7 +143,7 @@ env:
 ## Arguments:
 ```bash
 usage: arcode.py [-h] [--dir DIR] [--autowrite AUTOWRITE] [--focused FOCUSED] [--model MODEL] [--model_embedding MODEL_EMBEDDING]
-                 [--mode {implement,question}]
+                 [--mode {implement,question}] [--token_encoding TOKEN_ENCODING] [--ignore [IGNORE ...]]
                  [requirements ...]
 
 positional arguments:
@@ -149,14 +153,19 @@ options:
   -h, --help            show this help message and exit
   --dir DIR             The working directory of the codebase, default to current directory.
   --autowrite AUTOWRITE
-                        Whether or not to immediately write the changeset. Useful when piping to arcode, e.g. cat feature.txt | arcode
-  --focused FOCUSED     Enable focused mode to limit files based on relevancy using embeddings - accepts an integer containing number of files to limit
-                        context to.
-  --model MODEL         Specify the LLM provider/model to use with LiteLLM, default to openai/gpt-4o.
+                        Whether or not to immediately write the changeset. Useful when piping to arcode, e.g. cat feature.txt |
+                        arcode
+  --focused FOCUSED     Enable focused mode to limit file context provided based on relevancy using embeddings - accepts an integer
+                        containing number of file chunks to limit context to.
+  --model MODEL         LLM provider/model to use with LiteLLM, default to openai/gpt-4o.
   --model_embedding MODEL_EMBEDDING
-                        Specify the LLM provider/model to use for embeddings with LiteLLM, default to openai/text-embedding-3-small.
+                        LLM provider/model to use for embeddings with LiteLLM, default to openai/text-embedding-3-small.
   --mode {implement,question}
-                        Specify the mode for the tool: "implement" for feature building and "question" for asking questions about the codebase.
+                        Mode for the tool: "implement" for feature building and "question" for asking questions about the codebase.
+  --token_encoding TOKEN_ENCODING
+                        Encoding used for counting tokens before issuing a completion request
+  --ignore [IGNORE ...]
+                        Additional ignore patterns to use when parsing .gitignore
 ```
 
 ## Models
