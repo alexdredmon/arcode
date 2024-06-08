@@ -1,5 +1,5 @@
 # arcode
-![arcode logo](logo.png)
+![arcode logo](logo-arcode.png)
 
 ## Description
 
