@@ -11,7 +11,7 @@ from lib.shell_util import (
     RESET_COLOR, BLACK_ON_WHITE, WHITE_ON_BLACK,
     LIGHT_PINK
 )
-from litellm import embedding
+from lib.litellm_client import create_litellm_client_embeddings
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module='pydantic')
@@ -19,23 +19,13 @@ warnings.filterwarnings("ignore", category=UserWarning, module='pydantic')
 CACHE_FILENAME = ".arcode.cache.pkl"
 CHECKSUM_FILENAME = ".arcode.checksum.txt"
 
-class LitellmEmbeddings:
-    def __init__(self, model, api_key):
-        self.model = model
-        self.api_key = api_key
-
-    def embed_documents(self, texts):
-        response = embedding(model=self.model, input=texts, api_key=self.api_key)
-        embeddings = [item['embedding'] for item in response['data']]
-        return embeddings
-
-    def embed_query(self, query):
-        response = embedding(model=self.model, input=[query], api_key=self.api_key)
-        embedding_result = response['data'][0]['embedding']
-        return embedding_result
-
 def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, num_files=42):
-    api_key = get_api_keys(model_embedding)
+    api_base = None
+    api_version = None
+    if model_embedding.startswith('azure/'):
+        api_key, api_base, api_version = get_api_keys(model_embedding)
+    else:
+        api_key = get_api_keys(model_embedding)
 
     current_checksum = calculate_directory_checksum(startpath, ignore_patterns)
 
@@ -50,7 +40,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, n
         with open(CACHE_FILENAME, 'rb') as f:
             cache_data = pickle.load(f)
             documents = [Document(**doc) for doc in cache_data['documents']]
-            embeddings = LitellmEmbeddings(model=model_embedding, api_key=api_key)
+            embeddings = create_litellm_client_embeddings(model=model_embedding, api_key=api_key, api_base=api_base, api_version=api_version)
             db = DocArrayInMemorySearch.from_documents(documents, embeddings)
     else:
         file_contents = []
@@ -79,7 +69,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, n
         text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=20)
         docs = text_splitter.split_documents(file_contents)
 
-        embeddings = LitellmEmbeddings(model=model_embedding, api_key=api_key)
+        embeddings = create_litellm_client_embeddings(model=model_embedding, api_key=api_key, api_base=api_base, api_version=api_version)
         db = DocArrayInMemorySearch.from_documents(docs, embeddings)
 
         cache_data = {
