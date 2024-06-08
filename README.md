@@ -3,7 +3,7 @@
 
 ## Description
 
-Arcode is a command-line tool designed to help facilitate holistic software development via LLM. It allows users generate feature implementations for a given codebase based on user-defined requirements.
+Arcode is a command-line tool designed to help facilitate holistic software development via LLM. It allows users to generate feature implementations for a given codebase based on user-defined requirements.
 
 ## Features
 
@@ -28,16 +28,15 @@ positional arguments:
   requirements       Requirements for features to build on the codebase.
 
 options:
-  -h, --help         show this help message and exit
+  -h, --help         Show this help message and exit
   --dir DIR          The working directory of the codebase, default to current directory.
   --write WRITE      Whether or not to write the changeset immediately. If piping input to arcode, this defaults to true.
-  --focused FOCUSED  Enable focused mode to limit files based on relevancy using embeddings - accepts an integer containing number of files to limit
-                     context to.
+  --focused FOCUSED  Enable focused mode to limit files based on relevancy using embeddings - accepts an integer containing number of files to limit context to.
   --model MODEL      Specify the LLM provider/model to use with LiteLLM, default to openai/gpt-4o.
 ```
 
 ## Examples:
-Generate a plan and optionally write the changes based on requirements requirements:
+Generate a plan and optionally write the changes based on requirements:
 ```bash
 arcode "Implement authentication"
 ```
