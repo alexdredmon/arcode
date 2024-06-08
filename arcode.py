@@ -3,6 +3,7 @@
 import os
 import sys
 import io
+
 from contextlib import redirect_stdout
 from InquirerPy import prompt
 import pyperclip
@@ -25,12 +26,24 @@ from lib.embedding_util import get_top_relevant_files
 def main():
     args = parse_arguments()
 
-    if sys.stdin.isatty():
-        requirements = ' '.join(args.requirements)
+    if not args.requirements:
+        if sys.stdin.isatty():
+            requirements = ' '.join(args.requirements)
+        else:
+            requirements = sys.stdin.read().strip()
     else:
-        requirements = sys.stdin.read().strip()
+        requirements = ' '.join(args.requirements).strip()
 
     ignore_patterns = parse_gitignore(os.path.join(args.dir, '.gitignore'))
+
+    print(f"\n{WHITE_ON_BLACK} ⚙️ {BLACK_ON_WHITE} CONFIGURATION: {RESET_COLOR}")
+    print(f"{LIGHT_PINK}       Config file: {LIGHT_BLUE}{args.config_from_file}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}         Directory: {LIGHT_BLUE}{args.dir}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}             Model: {LIGHT_BLUE}{args.model}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}   Embedding Model: {LIGHT_BLUE}{args.model_embedding}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}        Auto-write: {LIGHT_BLUE}{args.autowrite}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}           Focused: {LIGHT_BLUE}{args.focused}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}              Mode: {LIGHT_BLUE}{args.mode}{RESET_COLOR}")
 
     # Validate and fetch the API keys for the provided model
     api_keys = get_api_keys(args.model)
@@ -139,9 +152,12 @@ def main():
 
             print(f"{WHITE_ON_BLACK} ⚡️ {BLACK_ON_WHITE} ACTION: {RESET_COLOR}")
             exit_menu = False
+            if args.autowrite:
+                write_files(files, args.dir)
+                print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")
+
             while not exit_menu:
                 answers = prompt(questions)
-
                 if answers['next_step'] == '📑 Copy full response':
                     pyperclip.copy(streamed_response)
                     print("Response copied to clipboard.")
@@ -161,7 +177,7 @@ def main():
                 elif answers['next_step'] == "🚪 Exit":
                     exit_menu = True
     else:
-        if args.write:
+        if args.autowrite:
             write_files(files, args.dir)
             print(f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}")
 

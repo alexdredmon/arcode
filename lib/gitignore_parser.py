@@ -1,5 +1,17 @@
 import os
 
+DEFAULT_IGNORE_PATTERNS = [
+    "__pycache__",
+    "venv",
+    ".git",
+    ".DS_Store",
+    ".arcode.cache.pkl",
+    ".arcode.checksum.txt",
+    ".arcode.embeddings",
+    ".env",
+    "node_modules",
+]
+
 def parse_gitignore(gitignore_path):
     if not os.path.exists(gitignore_path):
         return set()
@@ -7,7 +19,7 @@ def parse_gitignore(gitignore_path):
     with open(gitignore_path, 'r') as file:
         lines = file.readlines()
 
-    ignore_patterns = set()
+    ignore_patterns = set(DEFAULT_IGNORE_PATTERNS)
     for line in lines:
         line = line.strip()
         if line and not line.startswith('#'):

@@ -1,8 +1,13 @@
 import os
 from dotenv import load_dotenv
+import yaml
 
 # Load environment variables from .env file
 load_dotenv()
+
+def load_env_vars_from_config(config_vars):
+    for key, value in config_vars.items():
+        os.environ[key] = value
 
 # Retrieve API keys based on model prefixes
 def get_api_keys(model):
@@ -30,4 +35,3 @@ def get_api_keys(model):
         return (key, base, version)
     else:
         raise ValueError(f"Unsupported model provider for model '{model}'")
-
