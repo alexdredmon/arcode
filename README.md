@@ -169,6 +169,7 @@ options:
                         Encoding used for counting tokens before issuing a completion request
   --ignore [IGNORE ...]
   --resources [RESOURCES ...]
+  --resources [RESOURCES ...]
                         Additional ignore patterns to use when parsing .gitignore
   --resources RESOURCES
                         List of URLs to fetch and include in the prompt context

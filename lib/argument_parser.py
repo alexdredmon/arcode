@@ -14,6 +14,7 @@ ARG_KEYS = [
     "ignore",
     "resources",
 ]
+]
 
 def parse_arguments():
 

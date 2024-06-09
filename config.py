@@ -35,3 +35,9 @@ def get_api_keys(model):
         return (key, base, version)
     else:
         raise ValueError(f"Unsupported model provider for model '{model}'")
+
+def load_env_vars_from_config(config_vars):
+    for key, value in config_vars.items():
+        os.environ[key] = value
+    if 'resources' in config_vars:
+        args.resources = config_vars['resources']
