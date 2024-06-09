@@ -28,6 +28,15 @@ binary_extensions = {
     '.part', 
 }
 
+file_parse_pattern = re.compile(
+    r"===\.= ==== FILENAME: (?P<filename>.*?) = ===== =========\n```.*?\n(?P<content>.*?)\n```\n===\.= ==== EOF: (?P=filename) = ===== =========",
+    re.DOTALL
+)
+# Define the pattern for the starting token
+middle_of_file_start_pattern = re.compile(r"===\.= ==== FILENAME: .*? = ===== =========\n```(.*?)\n", re.DOTALL)
+# Define the pattern for the closing token
+middle_of_file_end_pattern = re.compile(r"===\.= ==== EOF: .*? = ===== =========\n", re.DOTALL)
+
 def is_binary_file(filename):
     return os.path.splitext(filename)[1].lower() in binary_extensions
 
@@ -71,13 +80,19 @@ def get_files(startpath, ignore_patterns):
     return all_files
 
 def parse_files(string):
-    pattern = re.compile(
-        r"===\.= ==== FILENAME: (?P<filename>.*?) = ===== =========\n```.*?\n(?P<content>.*?)\n```\n===\.= ==== EOF: (?P=filename) = ===== =========",
-        re.DOTALL
-    )
-    matches = pattern.findall(string)
+    matches = file_parse_pattern.findall(string)
     files = [{"filename": match[0].strip(), "contents": match[1].strip()} for match in matches]
     return files
+
+def is_in_middle_of_file(string):
+    # Find all starting and closing tokens
+    start_matches = middle_of_file_start_pattern.findall(string)
+    end_matches = middle_of_file_end_pattern.findall(string)
+
+    # Check if there's a start token without a corresponding end token
+    if len(start_matches) > len(end_matches):
+        return True
+    return False
 
 def extract_estimated_characters(string):
     pattern = re.compile(

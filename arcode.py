@@ -14,12 +14,12 @@ from litellm.llms.openai import OpenAIError
 from config import get_api_keys
 from lib.argument_parser import parse_arguments
 from lib.gitignore_parser import parse_gitignore
-from lib.file_util import print_tree, get_files, format_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters, calculate_line_difference
+from lib.file_util import is_in_middle_of_file, print_tree, get_files, format_file_contents, is_binary_file, is_ignored, parse_files, extract_estimated_characters, calculate_line_difference
 from lib.prompt_templates import AUTODEV_PROMPT_PRE, AUTODEV_PROMPT_POST_TEMPLATE, QUESTION_PROMPT_PRE, QUESTION_PROMPT_POST_TEMPLATE
 from lib.litellm_client import create_litellm_client, calculate_token_count
 from lib.shell_util import (
     LIGHT_PINK, LIGHT_GREEN, LIGHT_RED, LIGHT_BLUE, RESET_COLOR, WHITE_ON_DARK_BLUE, BLACK_ON_WHITE,
-    WHITE_ON_BLACK, LIGHT_ORANGE, BLACK_BACKGROUND
+    WHITE_ON_BLACK, LIGHT_ORANGE, BLACK_BACKGROUND, BLACK_ON_LIGHT_ORANGE, BLACK_ON_LIGHT_GREEN
 )
 from lib.file_writer import write_files
 
@@ -131,14 +131,25 @@ def main():
             print(f"\n{WHITE_ON_BLACK} 🌐 {BLACK_ON_WHITE} STREAMING RESPONSE: {RESET_COLOR}")
             streamed_response = ""
             response_chunks = []
-
+            print("    ", end="", flush=True)
             for chunk in completion:
                 if chunk and chunk.choices and chunk.choices[0] and chunk.choices[0].delta:
                     delta = chunk.choices[0].delta
                     if delta.get('content'):
-                        print(f"{BLACK_BACKGROUND}{LIGHT_ORANGE}{delta['content']}{RESET_COLOR}", end="", flush=True)
-                        streamed_response += delta['content']
-                        response_chunks.append(delta['content'])
+                        content = delta['content']
+                        streamed_response += content
+                        if is_in_middle_of_file(streamed_response):
+                            print(LIGHT_ORANGE, end="", flush=True)
+                        else:
+                            print(
+                                f"{RESET_COLOR}{BLACK_BACKGROUND}{LIGHT_BLUE}",
+                                end="",
+                                flush=True
+                            )
+                        response_chunks.append(content)
+                        printed_content = content.replace("\n", "\n    ")
+                        print(f"{printed_content}{RESET_COLOR}", end="", flush=True)
+                        
 
         except OpenAIError as e:
             print(f"{BLACK_BACKGROUND}{LIGHT_RED}{e.message}{RESET_COLOR}")
@@ -149,17 +160,21 @@ def main():
 
         if sys.stdin.isatty():
             choices = ['💬 Followup prompt', '🏗️  Write changeset to files', '📑 Copy full response']
+
+
             for file in files:
                 filename = file["filename"]
                 choices.append(f"📄 Copy file {filename}")
+
+            if len(files):
+                print(f"\n\n{WHITE_ON_BLACK} 📁 {BLACK_ON_WHITE} FILES TO UPDATE: {RESET_COLOR}")
 
             # Print file changes
             for file in files:
                 filename = file["filename"]
                 new_content = file["contents"]
                 line_diff = calculate_line_difference(os.path.join(args.dir, filename), new_content)
-                line_diff_str = f"{LIGHT_GREEN}{filename} ({line_diff:+d}){RESET_COLOR}"
-                print(f"\n\n{WHITE_ON_BLACK} 📁 {BLACK_ON_WHITE} FILES TO UPDATE: {RESET_COLOR}")
+                line_diff_str = f"    {LIGHT_PINK}* {LIGHT_GREEN}{filename} ({line_diff:+d}){RESET_COLOR}"
                 print(line_diff_str)
                 print("")
 

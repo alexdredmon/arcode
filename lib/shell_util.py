@@ -1,4 +1,3 @@
-
 LIGHT_BLUE='\033[94m'
 LIGHT_RED='\033[91m'
 LIGHT_PINK = '\033[95m'
@@ -11,3 +10,7 @@ BLACK_BACKGROUND='\033[40m'
 BLACK_ON_WHITE='\033[30;47m'
 WHITE_ON_BLACK='\033[37;40m'
 WHITE_ON_DARK_BLUE='\033[37;44m'
+
+# new color configurations
+BLACK_ON_LIGHT_ORANGE='\033[30;48;5;216m'  # Light orange background, black text
+BLACK_ON_LIGHT_GREEN = '\033[30;48;5;119m'  # Light green background, black text
