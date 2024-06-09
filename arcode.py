@@ -57,6 +57,7 @@ def main():
     print(f"{LIGHT_PINK}            Focused: {LIGHT_BLUE}{args.focused}{RESET_COLOR}")
     print(f"{LIGHT_PINK}             Ignore: {LIGHT_BLUE}{args.ignore}{RESET_COLOR}")
     print(f"{LIGHT_PINK}               Mode: {LIGHT_BLUE}{args.mode}{RESET_COLOR}")
+    print(f"{LIGHT_PINK}          Resources: {LIGHT_BLUE}{args.resources}{RESET_COLOR}")
 
     if args.focused:
         files = get_top_relevant_files(
@@ -88,7 +89,7 @@ def main():
                     response = requests.get(url)
                     response.raise_for_status()
                     soup = BeautifulSoup(response.content, 'html.parser')
-                    body_content = soup.body.get_text(separator="\n", strip=True)
+                    body_content = str(soup.body)
                     print(f"\nURL: {url}\n{body_content}")
                 except requests.RequestException as e:
                     print(f"Failed to fetch {url}: {e}")
