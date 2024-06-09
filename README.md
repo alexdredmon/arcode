@@ -9,7 +9,7 @@ Arcode is a command-line tool designed to help facilitate holistic software deve
 
 - Provide requirements and get recommended changes
 - Single button press confirmation + implementation
-- Supplies context from your repo/local files
+- Supplies context from your local files and select remote resources
 - Optional limiting of file context based on relevancy to features
 - Support for various providers/models via LiteLLM
 
@@ -153,8 +153,8 @@ env:
 
 ## Arguments:
 ```bash
-usage: arcode.py [-h] [--dir DIR] [--autowrite AUTOWRITE] [--focused FOCUSED] [--model MODEL] [--model_embedding MODEL_EMBEDDING]
-                 [--mode {implement,question}] [--token_encoding TOKEN_ENCODING] [--ignore [IGNORE ...]]
+usage: arcode [-h] [--dir DIR] [--autowrite AUTOWRITE] [--focused FOCUSED] [--model MODEL] [--model_embedding MODEL_EMBEDDING]
+                 [--mode {implement,question}] [--token_encoding TOKEN_ENCODING] [--ignore [IGNORE ...]] [--resources [RESOURCES ...]]
                  [requirements ...]
 
 positional arguments:
@@ -164,8 +164,7 @@ options:
   -h, --help            show this help message and exit
   --dir DIR             The working directory of the codebase, default to current directory.
   --autowrite AUTOWRITE
-                        Whether or not to immediately write the changeset. Useful when piping to arcode, e.g. cat feature.txt |
-                        arcode
+                        Whether or not to immediately write the changeset. Useful when piping to arcode, e.g. cat feature.txt | arcode
   --focused FOCUSED     Enable focused mode to limit file context provided based on relevancy using embeddings - accepts an integer
                         containing number of file chunks to limit context to.
   --model MODEL         LLM provider/model to use with LiteLLM, default to openai/gpt-4o.
@@ -176,11 +175,8 @@ options:
   --token_encoding TOKEN_ENCODING
                         Encoding used for counting tokens before issuing a completion request
   --ignore [IGNORE ...]
-  --resources [RESOURCES ...]
-  --resources [RESOURCES ...]
-  --resources [RESOURCES ...]
                         Additional ignore patterns to use when parsing .gitignore
-  --resources RESOURCES
+  --resources [RESOURCES ...]
                         List of URLs to fetch and include in the prompt context
 ```
 
