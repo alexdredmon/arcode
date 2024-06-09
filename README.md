@@ -112,6 +112,14 @@ To install Arcode via Homebrew:
     brew install arcode
     ```
 
+## Upgrade
+
+To upgrade to the latest version, simply:
+  ```bash
+  brew update
+  brew upgrade arcode
+  ```
+
 ## Usage
 
 Run Arcode with and pass it your requirements:
