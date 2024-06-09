@@ -33,6 +33,11 @@ Use with input from a file:
 cat feature_requirements.txt | arcode --dir ./my_codebase
 ```
 
+Provide remote resources
+```bash
+arcode "Follow the latest docs in the provided resources to add a LangChain SQL query chain to retrieve relevant reporting details from the databse given user input" --resources="https://api.python.langchain.com/en/latest/chains/langchain.chains.sql_database.query.create_sql_query_chain.html#langchain.chains.sql_database.query.create_sql_query_chain"
+```
+
 ## Install
 
 1. Ensure [Homebrew](https://brew.sh/) is installed
