@@ -4,7 +4,9 @@ import os
 import sys
 import io
 
+import requests
 from contextlib import redirect_stdout
+from bs4 import BeautifulSoup
 from InquirerPy import prompt
 import pyperclip
 from litellm.llms.openai import OpenAIError
@@ -79,6 +81,18 @@ def main():
             path = file["path"]
             print(f"    {LIGHT_PINK}* {LIGHT_BLUE}{path}{RESET_COLOR}")
     with redirect_stdout(f):
+        if args.resources:
+            print("\nResources:")
+            for url in args.resources:
+                try:
+                    response = requests.get(url)
+                    response.raise_for_status()
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    body_content = soup.body.get_text(separator="\n", strip=True)
+                    print(f"\nURL: {url}\n{body_content}")
+                except requests.RequestException as e:
+                    print(f"Failed to fetch {url}: {e}")
+
         if args.mode == "question":
             print(QUESTION_PROMPT_PRE)
         else:

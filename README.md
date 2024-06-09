@@ -136,6 +136,9 @@ args:
     - build
     - dist
     - secrets
+  resources:
+    - https://example.com/resource1
+    - https://example.com/resource2
 env:
   ANTHROPIC_API_KEY: 3xampl3
 ```
@@ -165,7 +168,10 @@ options:
   --token_encoding TOKEN_ENCODING
                         Encoding used for counting tokens before issuing a completion request
   --ignore [IGNORE ...]
+  --resources [RESOURCES ...]
                         Additional ignore patterns to use when parsing .gitignore
+  --resources RESOURCES
+                        List of URLs to fetch and include in the prompt context
 ```
 
 ## Models

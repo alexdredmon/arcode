@@ -12,6 +12,7 @@ ARG_KEYS = [
     "mode",
     "token_encoding",
     "ignore",
+    "resources",
 ]
 
 def parse_arguments():
@@ -26,9 +27,27 @@ def parse_arguments():
     parser.add_argument('--token_encoding', type=str, default='cl100k_base', help='Encoding used for counting tokens before issuing a completion request')
     parser.add_argument('--ignore', type=str, nargs='*', help='Additional ignore patterns to use when parsing .gitignore')
     parser.add_argument('requirements', nargs='*', type=str, help='Requirements for features to build on the codebase or question to ask about the codebase.')
+    parser.add_argument('--resources', nargs='*', type=str, help='List of URLs to fetch and include in the prompt context')
 
     cli_args = parser.parse_args()
 
+    # Load configuration from arcodeconf.yml if exists
+    config_path = os.path.join(cli_args.dir, "arcodeconf.yml")
+
+    cli_args.config_from_file = False
+    if os.path.exists(config_path):
+        cli_args.config_from_file = True
+        with open(config_path, 'r') as config_file:
+            config = yaml.safe_load(config_file)
+            if config:
+                config_args = config.get("args", {})
+                if config_args:
+                    for key in ARG_KEYS:
+                        if key in config_args.keys():
+                            setattr(cli_args, key, config_args.get(key))
+                env_args = config_args.get("env", {})
+                if env_args:
+                    load_env_vars_from_config(env_args)
     # Load configuration from arcodeconf.yml if exists
     config_path = os.path.join(cli_args.dir, "arcodeconf.yml")
 
