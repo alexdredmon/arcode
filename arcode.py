@@ -226,7 +226,7 @@ def main():
                             if is_file_footer:
                                 print(LIGHT_BLUE, end="", flush=True)
 
-                            since_last_line = "".join(bits[1:])
+                            since_last_line = "\n".join(bits[1:])
             print(since_last_line)
 
         except OpenAIError as e:
