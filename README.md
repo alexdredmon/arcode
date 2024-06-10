@@ -139,7 +139,7 @@ python arcode.py "Build feature X"
 
 ## Configuration
 
-You can pass configuration via CLI arguments or by creating an `arcodeconf.yml` file in the root of your project working directory.  An `arcodeconf.yml` file can set arguments and environment variables for a project.
+You can pass configuration via CLI arguments or by creating an `arcodeconf.yml` file in your `~/.conf/` directory (i.e. global config at `~/.config/arcodeconf.yml`) and/or in the root of your project working directory.  An `arcodeconf.yml` file can set arguments and environment variables for a project.
 
 Sample `arcodeconf.yml`:
 ```yaml
