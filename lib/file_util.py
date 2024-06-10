@@ -18,11 +18,11 @@ middle_of_file_end_pattern = re.compile(
 )
 
 file_start_token = re.compile(
-    r"===\.= ==== FILENAME: .*? = ===== =========", re.DOTALL
+    r"===\.= ==== FILENAME: (.*?) = ===== =========", re.DOTALL
 )
 
 file_end_token = re.compile(
-    r"===\.= ==== EOF: .*? = ===== =========", re.DOTALL
+    r"===\.= ==== EOF: (.*?) = ===== =========", re.DOTALL
 )
 
 

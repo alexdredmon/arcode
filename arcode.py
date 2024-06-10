@@ -216,14 +216,21 @@ def main():
                         while "\n" in since_last_line:
                             bits = since_last_line.splitlines()
                             latest_line = bits[0]
-                            is_file_header = (
-                                "===.= ==== FILENAME: " in latest_line
-                                and extract_filename_start(latest_line)
-                            )
-                            is_file_footer = (
-                                "===.= ==== EOF: " in latest_line
-                                and extract_filename_end(latest_line)
-                            )
+
+                            filename = extract_filename_start(latest_line)
+                            is_file_header = filename != None
+                            if is_file_header:
+                                latest_line = f"═ 📄 {filename} " + "═" * (
+                                    60 - len(filename)
+                                )
+
+                            filename = extract_filename_end(latest_line)
+                            is_file_footer = filename != None
+                            if is_file_footer:
+                                latest_line = f"═ EOF: {filename}" + "═" * (
+                                    59 - len(filename)
+                                )
+
                             if is_file_header or is_file_footer:
                                 print(LIGHT_PINK, end="", flush=True)
 
@@ -231,6 +238,9 @@ def main():
                                 language = latest_line.replace("```", "")
                                 if language:
                                     lexer = get_lexer_by_name(language)
+                                    latest_line = (
+                                        " " * (66 - len(language)) + language
+                                    )
                             if is_file_footer:
                                 language = None
                                 lexer = None
