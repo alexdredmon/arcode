@@ -10,6 +10,9 @@ from bs4 import BeautifulSoup
 from InquirerPy import prompt
 import pyperclip
 from litellm.llms.openai import OpenAIError
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import TerminalFormatter
 
 from config import get_api_keys
 from lib.argument_parser import parse_arguments
@@ -192,6 +195,11 @@ def main():
             printed_lines = []
             since_last_line = ""
             latest_line = None
+            last_was_file_header = False
+            language = "python"
+            lexer = None
+
+            formatter = TerminalFormatter()
             for chunk in completion:
                 if (
                     chunk
@@ -219,10 +227,28 @@ def main():
                             if is_file_header or is_file_footer:
                                 print(LIGHT_PINK, end="", flush=True)
 
+                            if last_was_file_header and "```" in latest_line:
+                                language = latest_line.replace("```", "")
+                                if language:
+                                    lexer = get_lexer_by_name(language)
+                            if is_file_footer:
+                                language = None
+                                lexer = None
+
+                            if lexer:
+                                latest_line = highlight(
+                                    latest_line, lexer, formatter
+                                )
+                                if latest_line.endswith("\n"):
+                                    latest_line = latest_line[:-1]
+
                             print(f"{output_padding}{latest_line}")
 
                             if is_file_header:
                                 print(LIGHT_ORANGE, end="", flush=True)
+                                last_was_file_header = True
+                            else:
+                                last_was_file_header = False
                             if is_file_footer:
                                 print(LIGHT_BLUE, end="", flush=True)
 

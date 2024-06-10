@@ -35,9 +35,11 @@ import requests
 print("Hello world")
 ```
 ===.= ==== EOF: demofile1.py = ===== =========
-===.= ==== FILENAME: lib/demofile2.py = ===== =========
-# Just another demo file
-===.= ==== EOF: lib/demofile2.py = ===== =========
+===.= ==== FILENAME: lib/demofile2.js = ===== =========
+```javascript
+// Just another demo file
+```
+===.= ==== EOF: lib/demofile2.js = ===== =========
 """
 
 QUESTION_PROMPT_PRE = """
