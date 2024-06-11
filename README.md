@@ -7,7 +7,7 @@ Arcode is a command-line tool designed to help facilitate holistic software deve
 
 ## Features
 
-- Provide requirements and get recommended changes
+- Provide requirements and followup feedback to auto-build changes
 - Single button press confirmation + implementation
 - Supplies context from your local files and select remote resources
 - Optional limiting of file context based on relevancy to features
