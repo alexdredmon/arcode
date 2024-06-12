@@ -37,9 +37,7 @@ def stream_response(client, args, messages):
     try:
         completion = client(model=args.model, messages=messages, stream=True)
 
-        print(
-            f"\n{WHITE_ON_BLACK} 🌐 {BLACK_ON_WHITE} STREAMING RESPONSE: {RESET_COLOR}"
-        )
+        print(f"\n{LIGHT_ORANGE} 🌐 STREAMING RESPONSE: {RESET_COLOR}\n")
         streamed_response = ""
         response_chunks = []
         output_padding = "    "
@@ -72,15 +70,18 @@ def stream_response(client, args, messages):
                         filename = extract_filename_start(latest_line)
                         is_file_header = filename != None
                         if is_file_header:
-                            latest_line = f"═ 📄 {filename} " + "═" * (
-                                60 - len(filename)
+                            latest_line = (
+                                f"\n{output_padding}═ 📄 {filename} "
+                                + "═" * (60 - len(filename))
                             )
 
                         filename = extract_filename_end(latest_line)
                         is_file_footer = filename != None
                         if is_file_footer:
-                            latest_line = f"═ EOF: {filename} " + "═" * (
-                                58 - len(filename)
+                            latest_line = (
+                                f"═ EOF: {filename} "
+                                + "═" * (58 - len(filename))
+                                + "\n"
                             )
 
                         if is_file_header or is_file_footer:

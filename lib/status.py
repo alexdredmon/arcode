@@ -1,4 +1,5 @@
 from lib.shell_util import (
+    LIGHT_ORANGE,
     LIGHT_PINK,
     LIGHT_BLUE,
     WHITE_ON_BLACK,
@@ -10,10 +11,10 @@ from lib.shell_util import (
 def print_configuration(args, requirements):
     print(
         f"""
-{WHITE_ON_BLACK} 🏗️  {BLACK_ON_WHITE} BUILDING FEATURE: {RESET_COLOR}
+{LIGHT_ORANGE} 🏗️  BUILDING FEATURE: {RESET_COLOR}
 {LIGHT_PINK}    > {LIGHT_BLUE}{requirements}{RESET_COLOR}
 
-{WHITE_ON_BLACK} ⚙️  {BLACK_ON_WHITE} CONFIGURATION: {RESET_COLOR}
+{LIGHT_ORANGE} ⚙️  CONFIGURATION: {RESET_COLOR}
 {LIGHT_PINK}        Config file: {LIGHT_BLUE}{args.config_from_file}{RESET_COLOR}
 {LIGHT_PINK}          Directory: {LIGHT_BLUE}{args.dir}{RESET_COLOR}
 {LIGHT_PINK}              Model: {LIGHT_BLUE}{args.model}{RESET_COLOR}
@@ -27,11 +28,13 @@ def print_configuration(args, requirements):
     """
     )
 
+
 def print_tokens(input_tokens, output_tokens, total_tokens, token_encoding):
     print(
         f"""
-{WHITE_ON_BLACK} 🧮 {BLACK_ON_WHITE} TOKENS ({total_tokens:,} total) [{token_encoding}]{RESET_COLOR}
-    {LIGHT_PINK}In: {LIGHT_BLUE}{input_tokens:,}{RESET_COLOR}
-    {LIGHT_PINK}Out: {LIGHT_BLUE}{output_tokens:,}{RESET_COLOR}
+{LIGHT_ORANGE} 🧮 TOKENS [{token_encoding}]{RESET_COLOR}
+    {LIGHT_PINK}   In: {LIGHT_BLUE}{input_tokens:,}{RESET_COLOR}
+    {LIGHT_PINK}  Out: {LIGHT_BLUE}{output_tokens:,}{RESET_COLOR}
+    {LIGHT_PINK}Total: {LIGHT_BLUE}{total_tokens:,}{RESET_COLOR}
                 """
     )

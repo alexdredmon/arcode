@@ -41,6 +41,7 @@ from lib.streaming_response import stream_response
 from lib.user_menu import handle_user_menu
 from lib.embedding_util import get_top_relevant_files
 from lib.shell_util import (
+    LIGHT_ORANGE,
     LIGHT_PINK,
     LIGHT_BLUE,
     WHITE_ON_BLACK,
@@ -76,6 +77,10 @@ def main():
 
     startpath = args.dir
 
+    while not requirements:
+        print(f"{LIGHT_ORANGE} 🕹️  What are your requirements?")
+        requirements = input(f"{LIGHT_PINK}    > {LIGHT_BLUE}")
+
     print_configuration(args, requirements)
 
     # Use the build_prompt function to replace the in-place `redirect_stdout` logic
@@ -98,14 +103,14 @@ def main():
     )
 
     proceed = inquirer.confirm(
-        message=f"This will use ~{total_tokens:,} before output - are you sure?",
+        message=f"  This will use ~{total_tokens:,} tokens before output - are you sure?",
         default=True,
     ).execute()
 
     if not proceed:
-        exit("\n👋 Good day!")
+        exit(f"\n 👋 {LIGHT_ORANGE}Good day!{RESET_COLOR}")
     else:
-        print("\n🚀 Let's do this.")
+        print(f"\n 🚀 {LIGHT_ORANGE}Let's do this.{RESET_COLOR}")
 
     answers = {"next_step": None}
 

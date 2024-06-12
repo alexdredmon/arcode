@@ -10,10 +10,12 @@ from lib.shell_util import (
     LIGHT_PINK,
     LIGHT_BLUE,
     LIGHT_GREEN,
+    LIGHT_ORANGE,
     WHITE_ON_BLACK,
     BLACK_ON_WHITE,
     RESET_COLOR,
 )
+from lib.status import print_tokens
 import sys
 
 
@@ -34,11 +36,9 @@ def handle_user_menu(args, files, messages, streamed_response):
         if len(files):
             requirements_text = " ".join(args.requirements)
             print(
-                f"\n\n{WHITE_ON_BLACK} 📃 {BLACK_ON_WHITE} REQUIREMENTS: {RESET_COLOR}\n{LIGHT_PINK}    > {LIGHT_BLUE}{requirements_text}{RESET_COLOR}"
+                f"\n\n{LIGHT_ORANGE} 📃 REQUIREMENTS: {RESET_COLOR}\n{LIGHT_PINK}    > {LIGHT_BLUE}{requirements_text}{RESET_COLOR}"
             )
-            print(
-                f"\n\n{WHITE_ON_BLACK} 📁 {BLACK_ON_WHITE} FILES TO UPDATE: {RESET_COLOR}"
-            )
+            print(f"\n\n{LIGHT_ORANGE} 📁 FILES TO UPDATE: {RESET_COLOR}")
 
         # Print file changes
         for file in files:
@@ -49,7 +49,6 @@ def handle_user_menu(args, files, messages, streamed_response):
             )
             line_diff_str = f"    {LIGHT_PINK}* {LIGHT_GREEN}{filename} ({line_diff:+d}){RESET_COLOR}"
             print(line_diff_str)
-            print("")
 
         choices.append("🚪 Exit")
         if args.mode == "question":
@@ -67,21 +66,14 @@ def handle_user_menu(args, files, messages, streamed_response):
         input_tokens, output_tokens, total_tokens = calculate_token_count(
             args.model, messages, args.token_encoding
         )
-        print(
-            f"""
-{WHITE_ON_BLACK} 🧮 {BLACK_ON_WHITE} TOKENS ({total_tokens:,} total) [{args.token_encoding}]{RESET_COLOR}
-    {LIGHT_PINK}In: {LIGHT_BLUE}{input_tokens:,}{RESET_COLOR}
-    {LIGHT_PINK}Out: {LIGHT_BLUE}{output_tokens:,}{RESET_COLOR}
-                """
+        print_tokens(
+            input_tokens, output_tokens, total_tokens, args.token_encoding
         )
-
-        print(f"{WHITE_ON_BLACK} ⚡️ {BLACK_ON_WHITE} ACTION: {RESET_COLOR}")
+        print(f"{LIGHT_ORANGE} ⚡️ ACTION: {RESET_COLOR}")
         exit_menu = False
         if args.autowrite:
             write_files(files, args.dir)
-            print(
-                f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}"
-            )
+            print(f"\n{LIGHT_ORANGE} ✅ CHANGESET WRITTEN {RESET_COLOR}")
 
         while not exit_menu:
             answers = prompt(questions)
@@ -95,11 +87,9 @@ def handle_user_menu(args, files, messages, streamed_response):
                         pyperclip.copy(file["contents"])
             elif answers["next_step"] == "🏗️  Write changeset to files":
                 write_files(files, args.dir)
-                print(
-                    f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}"
-                )
+                print(f"\n{LIGHT_ORANGE} ✅ CHANGESET WRITTEN {RESET_COLOR}")
             elif answers["next_step"] == "💬 Followup prompt":
-                followup = input(">")
+                followup = input(f"     {LIGHT_PINK}>{LIGHT_BLUE}")
                 messages.append({"role": "user", "content": followup})
                 exit_menu = True
             elif answers["next_step"] == "🚪 Exit":
@@ -108,8 +98,6 @@ def handle_user_menu(args, files, messages, streamed_response):
     else:
         if args.autowrite:
             write_files(files, args.dir)
-            print(
-                f"\n{WHITE_ON_BLACK} ✅ {BLACK_ON_WHITE} CHANGESET WRITTEN {RESET_COLOR}"
-            )
+            print(f"\n{LIGHT_ORANGE} ✅ CHANGESET WRITTEN {RESET_COLOR}")
 
     return answers

@@ -11,6 +11,7 @@ from lib.prompt_templates import (
 )
 from lib.shell_util import (
     LIGHT_GREEN,
+    LIGHT_ORANGE,
     WHITE_ON_BLACK,
     BLACK_ON_WHITE,
     RESET_COLOR,
@@ -45,7 +46,7 @@ def build_prompt(args, requirements, startpath, ignore_patterns, files):
             model_embedding=args.model_embedding,
         )
         print(
-            f"\n{WHITE_ON_BLACK} 🔬 {BLACK_ON_WHITE} FOCUSING ON {args.focused} MOST RELEVANT FILE CHUNKS: {RESET_COLOR}"
+            f"\n{LIGHT_ORANGE} 🔬  FOCUSING ON {args.focused} MOST RELEVANT FILE CHUNKS: {RESET_COLOR}"
         )
         for file in files:
             path = file["path"]
@@ -57,7 +58,7 @@ def build_prompt(args, requirements, startpath, ignore_patterns, files):
         files = get_files(startpath, ignore_patterns)
         total = len(files)
         print(
-            f"\n{WHITE_ON_BLACK} 🗂️ {BLACK_ON_WHITE} INCLUDING ALL {total:,} UNIGNORED FILES: {RESET_COLOR}"
+            f"\n{LIGHT_ORANGE} 🗂️  INCLUDING {total:,} UNIGNORED FILES: {RESET_COLOR}"
         )
         for file in files:
             path = file["path"]
