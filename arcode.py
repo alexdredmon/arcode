@@ -2,16 +2,7 @@
 
 import os
 import sys
-import io
-import requests
-from contextlib import redirect_stdout
-from bs4 import BeautifulSoup
 from InquirerPy import inquirer
-import pyperclip
-from litellm.llms.openai import OpenAIError
-from pygments import highlight
-from pygments.lexers import get_lexer_by_name
-from pygments.formatters import TerminalFormatter
 from config import get_api_keys
 from lib.argument_parser import parse_arguments
 from lib.gitignore_parser import parse_gitignore
@@ -29,23 +20,14 @@ from lib.file_util import (
     calculate_line_difference,
     write_files,  # Updated reference
 )
-from lib.prompt_templates import (
-    AUTODEV_PROMPT_PRE,
-    AUTODEV_PROMPT_POST_TEMPLATE,
-    QUESTION_PROMPT_PRE,
-    QUESTION_PROMPT_POST_TEMPLATE,
-)
 from lib.litellm_client import create_litellm_client, calculate_token_count
 from lib.status import print_configuration, print_tokens
 from lib.streaming_response import stream_response
 from lib.user_menu import handle_user_menu
-from lib.embedding_util import get_top_relevant_files
 from lib.shell_util import (
     LIGHT_ORANGE,
     LIGHT_PINK,
     LIGHT_BLUE,
-    WHITE_ON_BLACK,
-    BLACK_ON_WHITE,
     RESET_COLOR,
 )
 from lib.prompt_builder import (
@@ -73,7 +55,7 @@ def main():
         os.path.join(args.dir, ".gitignore"), args.ignore
     )
 
-    api_keys = get_api_keys(args.model)
+    get_api_keys(args.model)
 
     startpath = args.dir
 

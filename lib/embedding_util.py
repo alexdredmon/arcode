@@ -1,13 +1,11 @@
 import os
-from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.vectorstores import DocArrayInMemorySearch
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.schema import Document
 from lib.file_util import is_binary_file, is_ignored
 from config import get_api_keys
 from lib.shell_util import (
-    RESET_COLOR, BLACK_ON_WHITE, WHITE_ON_BLACK,
-    LIGHT_PINK
+    RESET_COLOR, WHITE_ON_BLACK, LIGHT_PINK
 )
 from lib.litellm_client import create_litellm_client_embeddings
 from langchain.embeddings import CacheBackedEmbeddings

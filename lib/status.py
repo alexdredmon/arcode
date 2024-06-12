@@ -2,8 +2,6 @@ from lib.shell_util import (
     LIGHT_ORANGE,
     LIGHT_PINK,
     LIGHT_BLUE,
-    WHITE_ON_BLACK,
-    BLACK_ON_WHITE,
     RESET_COLOR,
 )
 

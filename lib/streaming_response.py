@@ -14,8 +14,6 @@ from lib.shell_util import (
     BLACK_BACKGROUND,
     LIGHT_RED,
     RESET_COLOR,
-    WHITE_ON_BLACK,
-    BLACK_ON_WHITE,
 )
 
 
@@ -42,7 +40,6 @@ def stream_response(client, args, messages):
         response_chunks = []
         output_padding = "    "
         print(f"{LIGHT_BLUE}", end="", flush=True)
-        printed_lines = []
         since_last_line = ""
         latest_line = None
         last_was_file_header = False

@@ -11,8 +11,6 @@ from lib.shell_util import (
     LIGHT_BLUE,
     LIGHT_GREEN,
     LIGHT_ORANGE,
-    WHITE_ON_BLACK,
-    BLACK_ON_WHITE,
     RESET_COLOR,
 )
 from lib.status import print_tokens

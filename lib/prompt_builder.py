@@ -12,8 +12,6 @@ from lib.prompt_templates import (
 from lib.shell_util import (
     LIGHT_GREEN,
     LIGHT_ORANGE,
-    WHITE_ON_BLACK,
-    BLACK_ON_WHITE,
     RESET_COLOR,
     LIGHT_PINK,
     LIGHT_BLUE,

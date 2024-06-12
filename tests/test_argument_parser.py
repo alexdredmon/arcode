@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch
 from lib.argument_parser import parse_arguments
-import sys
 
 class TestArgumentParser(unittest.TestCase):
 

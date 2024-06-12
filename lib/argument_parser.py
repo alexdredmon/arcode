@@ -1,7 +1,7 @@
 import argparse
 import os
 import yaml
-from config import get_api_keys, load_env_vars_from_config
+from config import load_env_vars_from_config
 
 ARG_KEYS = [
     "dir",

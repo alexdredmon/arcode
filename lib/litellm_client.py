@@ -29,9 +29,8 @@ class LitellmEmbeddings:
         Returns:
             list: List of embeddings for the provided texts.
         """
-        endpoint = None
         if self.model.startswith("azure/"):
-            endpoint = f"{self.api_base}/{self.api_version}/embeddings"
+            f"{self.api_base}/{self.api_version}/embeddings"
 
         response = embedding(
             model=self.model,
@@ -53,9 +52,8 @@ class LitellmEmbeddings:
         Returns:
             list: Embedding for the query.
         """
-        endpoint = None
         if self.model.startswith("azure/"):
-            endpoint = f"{self.api_base}/{self.api_version}/embeddings"
+            f"{self.api_base}/{self.api_version}/embeddings"
 
         response = embedding(
             model=self.model,
@@ -79,7 +77,7 @@ def create_litellm_client(model):
         function: The LiteLLM completion function.
     """
     # Just validate the model once, get API keys
-    api_key = get_api_keys(model)
+    get_api_keys(model)
     return completion
 
 

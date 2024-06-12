@@ -5,10 +5,8 @@ from lib.file_util import (
     is_binary_file,
     parse_files,
     is_in_middle_of_file,
-    extract_estimated_characters,
-    write_files
+    extract_estimated_characters
 )
-import os
 
 class TestFileUtil(unittest.TestCase):
 
