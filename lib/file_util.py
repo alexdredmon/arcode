@@ -27,6 +27,15 @@ file_end_token = re.compile(
 
 
 def extract_filename_start(text):
+    """
+    Extract the filename from the start token in the text.
+
+    Args:
+        text (str): The text containing the filename start token.
+
+    Returns:
+        str: The extracted filename or None if not found.
+    """
     matches = file_start_token.findall(text)
     if len(matches) == 1:
         return matches[0]
@@ -35,6 +44,15 @@ def extract_filename_start(text):
 
 
 def extract_filename_end(text):
+    """
+    Extract the filename from the end token in the text.
+
+    Args:
+        text (str): The text containing the filename end token.
+
+    Returns:
+        str: The extracted filename or None if not found.
+    """
     matches = file_end_token.findall(text)
     if len(matches) == 1:
         return matches[0]
@@ -43,10 +61,27 @@ def extract_filename_end(text):
 
 
 def is_binary_file(filename):
+    """
+    Check if a given filename is a binary file based on its extension.
+
+    Args:
+        filename (str): The filename to check.
+
+    Returns:
+        bool: True if the file is binary, False otherwise.
+    """
     return os.path.splitext(filename)[1].lower() in binary_extensions
 
 
 def print_tree(startpath, ignore_patterns, prefix=""):
+    """
+    Print the directory tree starting from the given path, ignoring specific patterns.
+
+    Args:
+        startpath (str): The starting directory path.
+        ignore_patterns (list): List of patterns to ignore during directory scan.
+        prefix (str, optional): Prefix string for formatting the tree. Defaults to "".
+    """
     for root, dirs, files in os.walk(startpath):
         dirs[:] = [
             d
@@ -75,6 +110,15 @@ def print_tree(startpath, ignore_patterns, prefix=""):
 
 
 def format_file_contents(files):
+    """
+    Format the file contents for display.
+
+    Args:
+        files (list): List of files with path and data.
+
+    Returns:
+        str: Formatted string of file contents.
+    """
     contents = ""
     for file in files:
         file_path = file["path"]
@@ -85,6 +129,16 @@ def format_file_contents(files):
 
 
 def get_files(startpath, ignore_patterns):
+    """
+    Retrieve files from the given starting path, ignoring specific patterns and binary files.
+
+    Args:
+        startpath (str): The starting directory path.
+        ignore_patterns (list): List of patterns to ignore during file search.
+
+    Returns:
+        list: List of dictionaries containing file paths and data.
+    """
     all_files = []
     for root, _, files in os.walk(startpath):
         files = [
@@ -119,6 +173,15 @@ def get_files(startpath, ignore_patterns):
 
 
 def parse_files(string):
+    """
+    Parse files from a given string containing file delimiters and content.
+
+    Args:
+        string (str): The string containing the file delimiters and content.
+
+    Returns:
+        list: List of dictionaries containing filenames and contents.
+    """
     matches = file_parse_pattern.findall(string)
     files = [
         {"filename": match[0].strip(), "contents": match[1].strip()}
@@ -128,6 +191,15 @@ def parse_files(string):
 
 
 def is_in_middle_of_file(string):
+    """
+    Check if a given string is in the middle of a file based on start and end tokens.
+
+    Args:
+        string (str): The string to check.
+
+    Returns:
+        bool: True if the string is in the middle of a file, False otherwise.
+    """
     # Find all starting and closing tokens
     start_matches = middle_of_file_start_pattern.findall(string)
     end_matches = middle_of_file_end_pattern.findall(string)
@@ -139,6 +211,15 @@ def is_in_middle_of_file(string):
 
 
 def extract_estimated_characters(string):
+    """
+    Extract the estimated character count from a given string.
+
+    Args:
+        string (str): The string containing the estimated character count.
+
+    Returns:
+        int: The extracted estimated character count.
+    """
     pattern = re.compile(r"## ESTIMATED CHARACTERS:\n(\d+)")
     match = pattern.search(string)
     if match:
@@ -147,6 +228,16 @@ def extract_estimated_characters(string):
 
 
 def calculate_line_difference(filepath, new_content):
+    """
+    Calculate the line difference between the current and new content of a file.
+
+    Args:
+        filepath (str): The file path.
+        new_content (str): The new file content.
+
+    Returns:
+        int: The difference in the number of lines.
+    """
     try:
         with open(filepath, "r", encoding="utf-8") as file:
             current_content = file.read()
@@ -157,3 +248,18 @@ def calculate_line_difference(filepath, new_content):
         return len(
             new_content.splitlines()
         )  # If file does not exist, return total lines as added
+
+
+def write_files(files, base_dir):
+    """
+    Write the provided file contents into the specified base directory.
+
+    Args:
+        files (list): List of files with filenames and contents.
+        base_dir (str): The base directory where the files should be written.
+    """
+    for file in files:
+        file_path = os.path.join(base_dir, file["filename"])
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(file["contents"])

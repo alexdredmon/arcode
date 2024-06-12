@@ -19,6 +19,19 @@ warnings.filterwarnings("ignore", category=UserWarning, module='pydantic')
 EMBEDDINGS_CACHE_DIR = ".arcode.embeddings"
 
 def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, num_files=42):
+    """
+    Get the top N relevant files to a given query using embeddings.
+
+    Args:
+        startpath (str): The starting directory path to scan for files.
+        ignore_patterns (list): List of patterns to ignore during file search.
+        query (str): The query to compare file contents against.
+        model_embedding (str): The embedding model to use for comparison.
+        num_files (int): Number of most relevant file chunks to retrieve.
+
+    Returns:
+        list: A list of dictionaries containing file paths, data and relevance scores.
+    """
     api_base = None
     api_version = None
     if model_embedding.startswith('azure/'):
