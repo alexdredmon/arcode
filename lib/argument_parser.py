@@ -13,6 +13,7 @@ ARG_KEYS = [
     "token_encoding",
     "ignore",
     "resources",
+    "token_count_by_file",
 ]
 
 
@@ -97,6 +98,13 @@ def parse_arguments():
         nargs="*",
         type=str,
         help="List of URLs to fetch and include in the prompt context",
+        action=ProvidedAction,
+    )
+    parser.add_argument(
+        "--token_count_by_file",
+        default=False,
+        type=bool,
+        help="Whether or not to show token count by file (for troubleshooting)",
         action=ProvidedAction,
     )
 

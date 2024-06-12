@@ -16,8 +16,10 @@ from lib.shell_util import (
     RESET_COLOR,
     LIGHT_PINK,
     LIGHT_BLUE,
+    LIGHT_RED,
 )
 from lib.embedding_util import get_top_relevant_files
+from lib.litellm_client import raw_token_count
 
 
 def build_prompt(args, requirements, startpath, ignore_patterns, files):
@@ -53,6 +55,19 @@ def build_prompt(args, requirements, startpath, ignore_patterns, files):
             )
     else:
         files = get_files(startpath, ignore_patterns)
+        total = len(files)
+        print(
+            f"\n{WHITE_ON_BLACK} 🗂️ {BLACK_ON_WHITE} INCLUDING ALL {total:,} UNIGNORED FILES: {RESET_COLOR}"
+        )
+        for file in files:
+            path = file["path"]
+            if args.token_count_by_file:
+                tokens = raw_token_count(file["data"], args.token_encoding)
+                print(
+                    f"    {LIGHT_PINK}* {LIGHT_BLUE}{path} {LIGHT_RED}({tokens:,}){RESET_COLOR}"
+                )
+            else:
+                print(f"    {LIGHT_PINK}* {LIGHT_BLUE}{path}")
 
     f = io.StringIO()
     with redirect_stdout(f):

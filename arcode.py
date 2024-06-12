@@ -6,7 +6,7 @@ import io
 import requests
 from contextlib import redirect_stdout
 from bs4 import BeautifulSoup
-from InquirerPy import prompt
+from InquirerPy import inquirer
 import pyperclip
 from litellm.llms.openai import OpenAIError
 from pygments import highlight
@@ -40,8 +40,17 @@ from lib.status import print_configuration, print_tokens
 from lib.streaming_response import stream_response
 from lib.user_menu import handle_user_menu
 from lib.embedding_util import get_top_relevant_files
-from lib.shell_util import LIGHT_PINK, LIGHT_BLUE, WHITE_ON_BLACK, BLACK_ON_WHITE, RESET_COLOR
-from lib.prompt_builder import build_prompt  # New import for prompt building logic
+from lib.shell_util import (
+    LIGHT_PINK,
+    LIGHT_BLUE,
+    WHITE_ON_BLACK,
+    BLACK_ON_WHITE,
+    RESET_COLOR,
+)
+from lib.prompt_builder import (
+    build_prompt,
+)  # New import for prompt building logic
+
 
 def main():
     """
@@ -70,7 +79,9 @@ def main():
     print_configuration(args, requirements)
 
     # Use the build_prompt function to replace the in-place `redirect_stdout` logic
-    user_content = build_prompt(args, requirements, startpath, ignore_patterns, [])
+    user_content = build_prompt(
+        args, requirements, startpath, ignore_patterns, []
+    )
 
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
@@ -82,7 +93,19 @@ def main():
     input_tokens, output_tokens, total_tokens = calculate_token_count(
         args.model, messages, args.token_encoding
     )
-    print_tokens(input_tokens, output_tokens, total_tokens, args.token_encoding)
+    print_tokens(
+        input_tokens, output_tokens, total_tokens, args.token_encoding
+    )
+
+    proceed = inquirer.confirm(
+        message=f"This will use ~{total_tokens:,} before output - are you sure?",
+        default=True,
+    ).execute()
+
+    if not proceed:
+        exit("\n👋 Good day!")
+    else:
+        print("\n🚀 Let's do this.")
 
     answers = {"next_step": None}
 

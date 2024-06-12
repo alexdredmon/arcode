@@ -172,7 +172,7 @@ options:
 1. Build a standalone executable via:
 
     ```bash
-    ./build.sh
+    ./scripts/build.sh
     ```
 
 2. A binary will be created in `./dist/arcode/arcode`
@@ -193,7 +193,7 @@ To install Arcode via Homebrew:
 
 2. Run the build script to generate the standalone executable and Homebrew formula:
     ```bash
-    ./build.sh
+    ./scripts/build.sh
     ```
 
 3. Move the generated formula into your local Homebrew formula directory:
@@ -214,6 +214,14 @@ To upgrade to the latest version, simply:
   brew update
   brew upgrade arcode
   ```
+
+## Tests
+
+1. Run tests via:
+
+    ```bash
+    ./scripts/run_tests.sh
+    ```
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for more details.

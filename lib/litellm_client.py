@@ -2,6 +2,7 @@ import tiktoken
 from litellm import completion, embedding
 from config import get_api_keys
 
+
 class LitellmEmbeddings:
     def __init__(self, model, api_key, api_base=None, api_version=None):
         """
@@ -31,9 +32,15 @@ class LitellmEmbeddings:
         endpoint = None
         if self.model.startswith("azure/"):
             endpoint = f"{self.api_base}/{self.api_version}/embeddings"
-        
-        response = embedding(model=self.model, input=texts, api_key=self.api_key, api_base=self.api_base, api_version=self.api_version)
-        embeddings = [item['embedding'] for item in response['data']]
+
+        response = embedding(
+            model=self.model,
+            input=texts,
+            api_key=self.api_key,
+            api_base=self.api_base,
+            api_version=self.api_version,
+        )
+        embeddings = [item["embedding"] for item in response["data"]]
         return embeddings
 
     def embed_query(self, query):
@@ -49,10 +56,17 @@ class LitellmEmbeddings:
         endpoint = None
         if self.model.startswith("azure/"):
             endpoint = f"{self.api_base}/{self.api_version}/embeddings"
-        
-        response = embedding(model=self.model, input=[query], api_key=self.api_key, api_base=self.api_base, api_version=self.api_version)
-        embedding_result = response['data'][0]['embedding']
+
+        response = embedding(
+            model=self.model,
+            input=[query],
+            api_key=self.api_key,
+            api_base=self.api_base,
+            api_version=self.api_version,
+        )
+        embedding_result = response["data"][0]["embedding"]
         return embedding_result
+
 
 def create_litellm_client(model):
     """
@@ -68,7 +82,10 @@ def create_litellm_client(model):
     api_key = get_api_keys(model)
     return completion
 
-def create_litellm_client_embeddings(model, api_key, api_base=None, api_version=None):
+
+def create_litellm_client_embeddings(
+    model, api_key, api_base=None, api_version=None
+):
     """
     Create a LiteLLM client for embeddings.
 
@@ -82,6 +99,7 @@ def create_litellm_client_embeddings(model, api_key, api_base=None, api_version=
         LitellmEmbeddings: The LitellmEmbeddings instance.
     """
     return LitellmEmbeddings(model, api_key, api_base, api_version)
+
 
 def calculate_token_count(model, messages, encoding):
     """
@@ -100,7 +118,16 @@ def calculate_token_count(model, messages, encoding):
     total_output = 0
     for message in messages:
         if message["role"] == "user":
-            total_input += len(encoding.encode(message['content']))
+            total_input += len(
+                encoding.encode(message["content"], disallowed_special=())
+            )
         else:
-            total_output += len(encoding.encode(message['content']))
+            total_output += len(
+                encoding.encode(message["content"], disallowed_special=())
+            )
     return total_input, total_output, total_input + total_output
+
+
+def raw_token_count(text, encoding):
+    encoding = tiktoken.get_encoding(encoding)
+    return len(encoding.encode(text, disallowed_special=()))
