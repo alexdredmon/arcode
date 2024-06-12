@@ -1,9 +1,11 @@
 from lib.shell_util import (
+    LIGHT_GREEN,
     LIGHT_ORANGE,
     LIGHT_PINK,
     LIGHT_BLUE,
     RESET_COLOR,
 )
+from lib.cost_estimator import CostEstimator
 
 
 def print_configuration(args, requirements):
@@ -27,12 +29,25 @@ def print_configuration(args, requirements):
     )
 
 
-def print_tokens(input_tokens, output_tokens, total_tokens, token_encoding):
+def print_tokens(
+    input_tokens, output_tokens, total_tokens, token_encoding, model
+):
+    cost_estimator = CostEstimator()
+    input_cost, output_cost, total_cost = cost_estimator.calculate_cost(
+        model, input_tokens, output_tokens
+    )
+
     print(
         f"""
 {LIGHT_ORANGE} 🧮 TOKENS [{token_encoding}]{RESET_COLOR}
     {LIGHT_PINK}   In: {LIGHT_BLUE}{input_tokens:,}{RESET_COLOR}
     {LIGHT_PINK}  Out: {LIGHT_BLUE}{output_tokens:,}{RESET_COLOR}
-    {LIGHT_PINK}Total: {LIGHT_BLUE}{total_tokens:,}{RESET_COLOR}
-                """
+    {LIGHT_PINK}Total: {LIGHT_BLUE}{total_tokens:,}{RESET_COLOR}"""
     )
+    if total_cost:
+        print(
+            f"""
+{LIGHT_ORANGE} 💰 COST ESTIMATE{RESET_COLOR}
+{LIGHT_PINK}    Cost: {LIGHT_GREEN}${total_cost:,.2f}{RESET_COLOR}
+"""
+        )

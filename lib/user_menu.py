@@ -65,7 +65,11 @@ def handle_user_menu(args, files, messages, streamed_response):
             args.model, messages, args.token_encoding
         )
         print_tokens(
-            input_tokens, output_tokens, total_tokens, args.token_encoding
+            input_tokens,
+            output_tokens,
+            total_tokens,
+            args.token_encoding,
+            args.model,
         )
         print(f"{LIGHT_ORANGE} ⚡️ ACTION: {RESET_COLOR}")
         exit_menu = False

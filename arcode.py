@@ -81,7 +81,7 @@ def main():
         args.model, messages, args.token_encoding
     )
     print_tokens(
-        input_tokens, output_tokens, total_tokens, args.token_encoding
+        input_tokens, output_tokens, total_tokens, args.token_encoding, args.model
     )
 
     proceed = inquirer.confirm(
