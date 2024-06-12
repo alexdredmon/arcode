@@ -2,7 +2,11 @@ from litellm.llms.openai import OpenAIError
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter
-from lib.file_util import extract_filename_start, extract_filename_end, parse_files
+from lib.file_util import (
+    extract_filename_start,
+    extract_filename_end,
+    parse_files,
+)
 from lib.shell_util import (
     LIGHT_PINK,
     LIGHT_BLUE,
@@ -11,8 +15,9 @@ from lib.shell_util import (
     LIGHT_RED,
     RESET_COLOR,
     WHITE_ON_BLACK,
-    BLACK_ON_WHITE
+    BLACK_ON_WHITE,
 )
+
 
 def stream_response(client, args, messages):
     """
@@ -30,9 +35,7 @@ def stream_response(client, args, messages):
     streamed_response = ""
 
     try:
-        completion = client(
-            model=args.model, messages=messages, stream=True
-        )
+        completion = client(model=args.model, messages=messages, stream=True)
 
         print(
             f"\n{WHITE_ON_BLACK} 🌐 {BLACK_ON_WHITE} STREAMING RESPONSE: {RESET_COLOR}"
@@ -76,8 +79,8 @@ def stream_response(client, args, messages):
                         filename = extract_filename_end(latest_line)
                         is_file_footer = filename != None
                         if is_file_footer:
-                            latest_line = f"═ EOF: {filename}" + "═" * (
-                                59 - len(filename)
+                            latest_line = f"═ EOF: {filename} " + "═" * (
+                                58 - len(filename)
                             )
 
                         if is_file_header or is_file_footer:
@@ -112,7 +115,14 @@ def stream_response(client, args, messages):
                             print(LIGHT_BLUE, end="", flush=True)
 
                         since_last_line = "\n".join(bits[1:])
-        print(since_last_line)
+        filename = extract_filename_end(since_last_line)
+        if filename:
+            since_last_line = f"═ EOF: {filename} " + "═" * (
+                58 - len(filename)
+            )
+            print(f"{output_padding}{LIGHT_PINK}{since_last_line}")
+        else:
+            print(f"{output_padding}{LIGHT_BLUE}{since_last_line}")
 
     except OpenAIError as e:
         print(f"{BLACK_BACKGROUND}{LIGHT_RED}{e.message}{RESET_COLOR}")

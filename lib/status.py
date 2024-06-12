@@ -6,11 +6,13 @@ from lib.shell_util import (
     RESET_COLOR,
 )
 
+
 def print_configuration(args, requirements):
     print(
         f"""
-{WHITE_ON_BLACK} 🏗️  {BLACK_ON_WHITE} BUILDING FEATURE(S): {RESET_COLOR}
-{LIGHT_PINK}> {LIGHT_BLUE}{requirements}{RESET_COLOR}
+{WHITE_ON_BLACK} 🏗️  {BLACK_ON_WHITE} BUILDING FEATURE: {RESET_COLOR}
+{LIGHT_PINK}    > {LIGHT_BLUE}{requirements}{RESET_COLOR}
+
 {WHITE_ON_BLACK} ⚙️  {BLACK_ON_WHITE} CONFIGURATION: {RESET_COLOR}
 {LIGHT_PINK}        Config file: {LIGHT_BLUE}{args.config_from_file}{RESET_COLOR}
 {LIGHT_PINK}          Directory: {LIGHT_BLUE}{args.dir}{RESET_COLOR}

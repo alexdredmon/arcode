@@ -1,7 +1,10 @@
 from InquirerPy import prompt
 import pyperclip
 import os
-from lib.file_util import calculate_line_difference, write_files  # Updated import
+from lib.file_util import (
+    calculate_line_difference,
+    write_files,
+)
 from lib.litellm_client import calculate_token_count
 from lib.shell_util import (
     LIGHT_PINK,
@@ -29,6 +32,10 @@ def handle_user_menu(args, files, messages, streamed_response):
             choices.append(f"📄 Copy file {filename}")
 
         if len(files):
+            requirements_text = " ".join(args.requirements)
+            print(
+                f"\n\n{WHITE_ON_BLACK} 📃 {BLACK_ON_WHITE} REQUIREMENTS: {RESET_COLOR}\n{LIGHT_PINK}    > {LIGHT_BLUE}{requirements_text}{RESET_COLOR}"
+            )
             print(
                 f"\n\n{WHITE_ON_BLACK} 📁 {BLACK_ON_WHITE} FILES TO UPDATE: {RESET_COLOR}"
             )
