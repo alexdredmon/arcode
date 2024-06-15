@@ -86,4 +86,5 @@ binary_extensions = {
     ".xpi",
     ".msi",
     ".part",
+    ".svg",
 }

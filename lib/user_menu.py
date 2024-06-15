@@ -91,7 +91,7 @@ def handle_user_menu(args, files, messages, streamed_response):
                 write_files(files, args.dir)
                 print(f"\n{LIGHT_ORANGE} ✅ CHANGESET WRITTEN {RESET_COLOR}")
             elif answers["next_step"] == "💬 Followup prompt":
-                followup = input(f"     {LIGHT_PINK}>{LIGHT_BLUE}")
+                followup = input(f"     {LIGHT_PINK}> {LIGHT_BLUE}")
                 messages.append({"role": "user", "content": followup})
                 exit_menu = True
             elif answers["next_step"] == "🚪 Exit":
