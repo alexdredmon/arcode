@@ -10,7 +10,10 @@ DEFAULT_IGNORE_PATTERNS = [
     ".arcode.embeddings",
     ".env",
     "node_modules",
+    ".next",
+    ".github",
 ]
+
 
 def parse_gitignore(gitignore_path, additional_patterns=None):
     """
@@ -26,12 +29,12 @@ def parse_gitignore(gitignore_path, additional_patterns=None):
     if not os.path.exists(gitignore_path):
         ignore_patterns = set(DEFAULT_IGNORE_PATTERNS)
     else:
-        with open(gitignore_path, 'r') as file:
+        with open(gitignore_path, "r") as file:
             lines = file.readlines()
         ignore_patterns = set(DEFAULT_IGNORE_PATTERNS)
         for line in lines:
             line = line.strip()
-            if line and not line.startswith('#'):
+            if line and not line.startswith("#"):
                 ignore_patterns.add(line)
 
     if additional_patterns:
@@ -40,6 +43,7 @@ def parse_gitignore(gitignore_path, additional_patterns=None):
         ignore_patterns.update(additional_patterns)
 
     return ignore_patterns
+
 
 def is_ignored(path, ignore_patterns):
     """
@@ -53,6 +57,11 @@ def is_ignored(path, ignore_patterns):
         bool: True if the path matches any ignore patterns, False otherwise.
     """
     for pattern in ignore_patterns:
-        if path.endswith(f"/{pattern}") or path.startswith(pattern) or path.startswith(f"./{pattern}") or f"/{pattern}/" in path:
+        if (
+            path.endswith(f"/{pattern}")
+            or path.startswith(pattern)
+            or path.startswith(f"./{pattern}")
+            or f"/{pattern}/" in path
+        ):
             return True
     return False
