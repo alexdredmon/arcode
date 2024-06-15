@@ -15,7 +15,6 @@ def print_configuration(args, requirements):
 {LIGHT_PINK}    > {LIGHT_BLUE}{requirements}{RESET_COLOR}
 
 {LIGHT_ORANGE} ⚙️  CONFIGURATION: {RESET_COLOR}
-{LIGHT_PINK}        Config file: {LIGHT_BLUE}{args.config_from_file}{RESET_COLOR}
 {LIGHT_PINK}          Directory: {LIGHT_BLUE}{args.dir}{RESET_COLOR}
 {LIGHT_PINK}              Model: {LIGHT_BLUE}{args.model}{RESET_COLOR}
 {LIGHT_PINK}    Embedding Model: {LIGHT_BLUE}{args.model_embedding}{RESET_COLOR}

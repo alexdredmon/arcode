@@ -130,7 +130,6 @@ def parse_arguments():
 
 
 def load_configurations(cli_args, config_path):
-    cli_args.config_from_file = True
     with open(config_path, "r") as config_file:
         config = yaml.safe_load(config_file)
 
