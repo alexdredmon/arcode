@@ -2,6 +2,7 @@ from litellm.llms.openai import OpenAIError
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter
+from pygments.util import ClassNotFound
 from lib.file_util import (
     extract_filename_start,
     extract_filename_end,
@@ -86,8 +87,15 @@ def stream_response(client, args, messages):
 
                         if last_was_file_header and "```" in latest_line:
                             language = latest_line.replace("```", "")
+                            if language == "plaintext":
+                                language = "plain"
+                            if language == "tsx":
+                                language = "typescript"
                             if language:
-                                lexer = get_lexer_by_name(language)
+                                try:
+                                    lexer = get_lexer_by_name(language)
+                                except ClassNotFound:
+                                    lexer = None
                                 latest_line = (
                                     " " * (66 - len(language)) + language
                                 )
