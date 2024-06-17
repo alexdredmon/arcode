@@ -13,6 +13,6 @@ docarray==0.40.0
 Pygments==2.18.0
 python-dotenv==1.0.0
 dill==0.3.6
-litellm==1.40.0
+litellm==1.40.15
 tiktoken
 pyinstaller==5.7.0
