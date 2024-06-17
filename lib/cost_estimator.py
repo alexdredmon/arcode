@@ -13,6 +13,10 @@ class CostEstimator:
                 "input_cost_per_million": 15,
                 "output_cost_per_million": 75,
             },
+            "azure/gpt-4o": {
+                "input_cost_per_million": 5,
+                "output_cost_per_million": 15,
+            },
         }
 
     def calculate_cost(self, model, input_tokens, output_tokens):
