@@ -1,7 +1,8 @@
 import tiktoken
 from litellm import completion, embedding
 from config import get_api_keys
-
+import requests
+import json
 
 class LitellmEmbeddings:
     def __init__(self, model, api_key, api_base=None, api_version=None):
@@ -129,3 +130,26 @@ def calculate_token_count(model, messages, encoding):
 def raw_token_count(text, encoding):
     encoding = tiktoken.get_encoding(encoding)
     return len(encoding.encode(text, disallowed_special=()))
+
+def get_available_models(filter_text=None):
+    """
+    Fetch and optionally filter available models from LiteLLM.
+
+    Args:
+        filter_text (str, optional): Text to filter models. If None, return all models.
+
+    Returns:
+        list: List of available models in the format "provider/model".
+    """
+    url = "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json"
+    response = requests.get(url)
+    models_data = json.loads(response.text)
+
+    available_models = []
+    for provider, models in models_data.items():
+        for model in models:
+            model_name = f"{provider}/{model}"
+            if filter_text is None or (filter_text.lower() in model_name.lower()):
+                available_models.append(model_name)
+
+    return sorted(available_models)

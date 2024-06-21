@@ -20,7 +20,7 @@ from lib.file_util import (
     calculate_line_difference,
     write_files,  # Updated reference
 )
-from lib.litellm_client import create_litellm_client, calculate_token_count
+from lib.litellm_client import create_litellm_client, calculate_token_count, get_available_models
 from lib.status import print_configuration, print_tokens
 from lib.streaming_response import stream_response
 from lib.user_menu import handle_user_menu
@@ -42,6 +42,14 @@ def main():
     print configurations, and handle user interactions.
     """
     args = parse_arguments()
+
+    if args.models is not None:
+        filter_text = args.models if isinstance(args.models, str) else None
+        available_models = get_available_models(filter_text)
+        print(f"{LIGHT_ORANGE}Available models:{RESET_COLOR}")
+        for model in available_models:
+            print(f"- {model}")
+        sys.exit(0)
 
     if not args.requirements:
         if sys.stdin.isatty():

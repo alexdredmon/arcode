@@ -14,6 +14,7 @@ ARG_KEYS = [
     "ignore",
     "resources",
     "token_count_by_file",
+    "models",
 ]
 
 
@@ -105,6 +106,13 @@ def parse_arguments():
         default=False,
         type=bool,
         help="Whether or not to show token count by file (for troubleshooting)",
+        action=ProvidedAction,
+    )
+    parser.add_argument(
+        "--models",
+        nargs="?",
+        const=True,
+        help="List available models. Optionally provide a filter string.",
         action=ProvidedAction,
     )
 
