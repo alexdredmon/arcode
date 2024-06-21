@@ -145,11 +145,9 @@ def get_available_models(filter_text=None):
     response = requests.get(url)
     models_data = json.loads(response.text)
 
-    available_models = []
-    for provider, models in models_data.items():
-        for model in models:
-            model_name = f"{provider}/{model}"
-            if filter_text is None or (filter_text.lower() in model_name.lower()):
-                available_models.append(model_name)
+    available_models = set()
+    for model, data in models_data.items():
+        if filter_text is None or (filter_text.lower() in model.lower()):
+            available_models.add(model)
 
-    return sorted(available_models)
+    return sorted(list(available_models))
