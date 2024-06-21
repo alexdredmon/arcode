@@ -5,7 +5,7 @@ from lib.shell_util import (
     LIGHT_BLUE,
     RESET_COLOR,
 )
-from lib.cost_estimator import CostEstimator
+from litellm import cost_per_token
 
 
 def print_configuration(args, requirements):
@@ -31,10 +31,15 @@ def print_configuration(args, requirements):
 def print_tokens(
     input_tokens, output_tokens, total_tokens, token_encoding, model
 ):
-    cost_estimator = CostEstimator()
-    input_cost, output_cost, total_cost = cost_estimator.calculate_cost(
-        model, input_tokens, output_tokens
+    (
+        input_cost,
+        output_cost,
+    ) = cost_per_token(
+        model=model,
+        prompt_tokens=input_tokens,
+        completion_tokens=output_tokens,
     )
+    total_cost = input_cost + output_cost
 
     print(
         f"""

@@ -5,17 +5,20 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 block_cipher = None
 
 # Collect data files
-tiktoken_datas = collect_data_files('tiktoken')
-litellm_datas = collect_data_files('litellm')
-tiktoken_submodules = collect_submodules('tiktoken')
-litellm_submodules = collect_submodules('litellm')
+tiktoken_datas = collect_data_files("tiktoken")
+litellm_datas = collect_data_files("litellm")
+tiktoken_submodules = collect_submodules("tiktoken")
+litellm_submodules = collect_submodules("litellm")
 
 a = Analysis(
-    ['arcode.py'],
+    ["arcode.py"],
     pathex=[],
     binaries=[],
     datas=tiktoken_datas + litellm_datas,
-    hiddenimports=tiktoken_submodules + litellm_submodules + ['tiktoken_ext.openai_public', 'tiktoken_ext'],
+    hiddenimports=["pkg_resources", "pkg_resources.extern"]
+    + tiktoken_submodules
+    + litellm_submodules
+    + ["tiktoken_ext.openai_public", "tiktoken_ext"],
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
@@ -33,7 +36,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='arcode',
+    name="arcode",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
