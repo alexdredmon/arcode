@@ -7,18 +7,11 @@ from config import get_api_keys
 from lib.argument_parser import parse_arguments
 from lib.gitignore_parser import parse_gitignore
 from lib.file_util import (
-    extract_filename_start,
-    extract_filename_end,
-    is_in_middle_of_file,
     print_tree,
     get_files,
     format_file_contents,
-    is_binary_file,
-    is_ignored,
     parse_files,
-    extract_estimated_characters,
-    calculate_line_difference,
-    write_files,  # Updated reference
+    write_files,
 )
 from lib.litellm_client import create_litellm_client, calculate_token_count, get_available_models
 from lib.status import print_configuration, print_tokens
@@ -30,9 +23,7 @@ from lib.shell_util import (
     LIGHT_BLUE,
     RESET_COLOR,
 )
-from lib.prompt_builder import (
-    build_prompt,
-)  # New import for prompt building logic
+from lib.prompt_builder import build_prompt
 
 
 def main():
@@ -43,37 +34,56 @@ def main():
     """
     args = parse_arguments()
 
+    # Handle --help flag
+    if '--help' in sys.argv:
+        return
+
+    # Handle --models flag
     if args.models is not None:
         filter_text = args.models if isinstance(args.models, str) else None
         available_models = get_available_models(filter_text)
         print(f"{LIGHT_ORANGE}Available models:{RESET_COLOR}")
         for model in available_models:
             print(f"- {model}")
-        sys.exit(0)
+        return
 
-    if not args.requirements:
-        if sys.stdin.isatty():
-            requirements = " ".join(args.requirements)
-        else:
-            requirements = sys.stdin.read().strip()
-    else:
+    # Get requirements
+    if args.requirements:
         requirements = " ".join(args.requirements).strip()
+    elif not sys.stdin.isatty():
+        requirements = sys.stdin.read().strip()
+    else:
+        requirements = ""
 
+    # Prompt for requirements if not provided
+    if not requirements:
+        print(f"{LIGHT_ORANGE} 🕹️  What are your requirements?")
+        requirements = input(f"{LIGHT_PINK}    > {LIGHT_BLUE}")
+
+    # Exit if still no requirements
+    if not requirements:
+        print(f"{LIGHT_ORANGE}No requirements provided. Exiting.{RESET_COLOR}")
+        return
+
+    # Store the requirements in args
+    args.requirements = requirements
+
+    # Parse gitignore
     ignore_patterns = parse_gitignore(
         os.path.join(args.dir, ".gitignore"), args.ignore
     )
 
-    get_api_keys(args.model)
+    # Load API keys only if we have requirements
+    try:
+        get_api_keys(args.model)
+    except ValueError as e:
+        print(f"{LIGHT_ORANGE}Error: {e}{RESET_COLOR}")
+        return
 
     startpath = args.dir
 
-    while not requirements:
-        print(f"{LIGHT_ORANGE} 🕹️  What are your requirements?")
-        requirements = input(f"{LIGHT_PINK}    > {LIGHT_BLUE}")
-
     print_configuration(args, requirements)
 
-    # Use the build_prompt function to replace the in-place `redirect_stdout` logic
     user_content = build_prompt(
         args, requirements, startpath, ignore_patterns, []
     )
@@ -85,28 +95,34 @@ def main():
 
     client = create_litellm_client(args.model)
 
-    input_tokens, output_tokens, total_tokens = calculate_token_count(
-        args.model, messages, args.token_encoding
-    )
-    print_tokens(
-        input_tokens, output_tokens, total_tokens, args.token_encoding, args.model
-    )
+    try:
+        input_tokens, output_tokens, total_tokens = calculate_token_count(
+            args.model, messages
+        )
+        print_tokens(
+            input_tokens, output_tokens, total_tokens, args.model
+        )
 
-    proceed = inquirer.confirm(
-        message=f"  This will use ~{total_tokens:,} tokens before output - are you sure?",
-        default=True,
-    ).execute()
+        proceed = inquirer.confirm(
+            message=f"  This will use ~{total_tokens:,} tokens before output - are you sure?",
+            default=True,
+        ).execute()
 
-    if not proceed:
-        exit(f"\n 👋 {LIGHT_ORANGE}Good day!{RESET_COLOR}")
-    else:
+        if not proceed:
+            print(f"\n 👋 {LIGHT_ORANGE}Good day!{RESET_COLOR}")
+            return
+
         print(f"\n 🚀 {LIGHT_ORANGE}Let's do this.{RESET_COLOR}")
 
-    answers = {"next_step": None}
+        answers = {"next_step": None}
 
-    while answers["next_step"] != "🚪 Exit":
-        files, streamed_response = stream_response(client, args, messages)
-        answers = handle_user_menu(args, files, messages, streamed_response)
+        while answers["next_step"] != "🚪 Exit":
+            files, streamed_response = stream_response(client, args, messages)
+            answers = handle_user_menu(args, files, messages, streamed_response)
+
+    except Exception as e:
+        print(f"{LIGHT_ORANGE}An error occurred: {e}{RESET_COLOR}")
+        return
 
 
 if __name__ == "__main__":

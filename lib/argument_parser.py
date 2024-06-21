@@ -10,7 +10,6 @@ ARG_KEYS = [
     "model",
     "model_embedding",
     "mode",
-    "token_encoding",
     "ignore",
     "resources",
     "token_count_by_file",
@@ -71,13 +70,6 @@ def parse_arguments():
         default="implement",
         choices=["implement", "question"],
         help='Mode for the tool: "implement" for feature building and "question" for asking questions about the codebase.',
-        action=ProvidedAction,
-    )
-    parser.add_argument(
-        "--token_encoding",
-        type=str,
-        default="cl100k_base",
-        help="Encoding used for counting tokens before issuing a completion request",
         action=ProvidedAction,
     )
     parser.add_argument(

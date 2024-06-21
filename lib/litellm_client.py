@@ -3,6 +3,7 @@ from litellm import completion, embedding
 from config import get_api_keys
 import requests
 import json
+from lib.shell_util import LIGHT_ORANGE, LIGHT_RED, RESET_COLOR
 
 class LitellmEmbeddings:
     def __init__(self, model, api_key, api_base=None, api_version=None):
@@ -100,19 +101,23 @@ def create_litellm_client_embeddings(
     return LitellmEmbeddings(model, api_key, api_base, api_version)
 
 
-def calculate_token_count(model, messages, encoding):
+def calculate_token_count(model, messages):
     """
     Calculate the token count for the input and output.
 
     Args:
         model (str): The model to be used.
         messages (list): List of messages.
-        encoding (str): The encoding to use for counting tokens.
 
     Returns:
         tuple: Total input tokens, total output tokens, and combined total tokens.
     """
-    encoding = tiktoken.get_encoding(encoding)
+    try:
+        encoding = tiktoken.encoding_for_model(model.split('/')[-1])
+    except Exception as e:
+        print(f"\n{LIGHT_ORANGE} ⚠️  No model-specific encoding for {model}, defaulting to 'cl100k_base'.{RESET_COLOR}")
+        encoding = tiktoken.get_encoding("cl100k_base")
+
     total_input = 0
     total_output = 0
     for message in messages:
@@ -127,8 +132,12 @@ def calculate_token_count(model, messages, encoding):
     return total_input, total_output, total_input + total_output
 
 
-def raw_token_count(text, encoding):
-    encoding = tiktoken.get_encoding(encoding)
+def raw_token_count(text, model):
+    try:
+        encoding = tiktoken.encoding_for_model(model.split('/')[-1])
+    except Exception as e:
+        print(f"\n{LIGHT_ORANGE} ⚠️  No model-specific encoding for {model}, defaulting to 'cl100k_base'.{RESET_COLOR}")
+        encoding = tiktoken.get_encoding("cl100k_base")
     return len(encoding.encode(text, disallowed_special=()))
 
 def get_available_models(filter_text=None):

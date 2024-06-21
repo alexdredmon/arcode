@@ -101,10 +101,9 @@ Set API keys based on the provider(s) you're using - these values should be pres
 
 ## Arguments:
 ```bash
-usage: arcode.py [-h] [--dir DIR] [--autowrite AUTOWRITE] [--focused FOCUSED] [--model MODEL]
-                 [--model_embedding MODEL_EMBEDDING] [--mode {implement,question}]
-                 [--token_encoding TOKEN_ENCODING] [--ignore [IGNORE ...]] [--resources [RESOURCES ...]]
-                 [--token_count_by_file TOKEN_COUNT_BY_FILE] [--models [MODELS]]
+usage: arcode [-h] [--dir DIR] [--autowrite AUTOWRITE] [--focused FOCUSED] [--model MODEL]
+                 [--model_embedding MODEL_EMBEDDING] [--mode {implement,question}] [--ignore [IGNORE ...]]
+                 [--resources [RESOURCES ...]] [--token_count_by_file TOKEN_COUNT_BY_FILE] [--models [MODELS]]
                  [requirements ...]
 
 positional arguments:
@@ -125,8 +124,6 @@ options:
   --mode {implement,question}
                         Mode for the tool: "implement" for feature building and "question" for asking questions
                         about the codebase.
-  --token_encoding TOKEN_ENCODING
-                        Encoding used for counting tokens before issuing a completion request
   --ignore [IGNORE ...]
                         Additional ignore patterns to use when parsing .gitignore
   --resources [RESOURCES ...]
