@@ -71,11 +71,17 @@ env:
 
 ## Models
 
-Popular supported models include:
+For best results, use one of the following models:
 
+ - `anthropic/claude-3-5-sonnet-20240620`
  - `openai/gpt-4o`
+ - `azure/gpt-4o`
+
+Other popular models include:
+
  - `anthropic/claude-3-opus-20240229`
- - `anthropic/claude-3-sonnet-20240229`
+ - `openai/gpt-4`
+ - `azure/gpt-4`
 
 Popular supported embedding models include:
 
