@@ -62,13 +62,12 @@ def handle_user_menu(args, files, messages, streamed_response):
         ]
 
         input_tokens, output_tokens, total_tokens = calculate_token_count(
-            args.model, messages, args.token_encoding
+            args.model, messages
         )
         print_tokens(
             input_tokens,
             output_tokens,
             total_tokens,
-            args.token_encoding,
             args.model,
         )
         print(f"{LIGHT_ORANGE} ⚡️ ACTION: {RESET_COLOR}")

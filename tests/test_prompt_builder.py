@@ -28,7 +28,6 @@ class TestPromptBuilder(unittest.TestCase):
         args.resources = ["http://example.com"]
         args.mode = "implement"
         args.model_embedding = "openai/text-embedding-3-small"
-        args.token_encoding = "cl100k_base"
         prompt = build_prompt(
             args, "requirements", "startpath", ["ignore_pattern"], []
         )
