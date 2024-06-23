@@ -60,7 +60,7 @@ def build_prompt(args, requirements, startpath, ignore_patterns, files):
         )
         for file in files:
             path = file["path"]
-            if args.token_count_by_file:
+            if args.debug:
                 tokens = raw_token_count(file["data"], args.model)
                 print(
                     f"    {LIGHT_PINK}* {LIGHT_BLUE}{path} {LIGHT_RED}({tokens:,}){RESET_COLOR}"

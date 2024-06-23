@@ -13,7 +13,11 @@ from lib.file_util import (
     parse_files,
     write_files,
 )
-from lib.litellm_client import create_litellm_client, calculate_token_count, get_available_models
+from lib.litellm_client import (
+    create_litellm_client,
+    calculate_token_count,
+    get_available_models,
+)
 from lib.status import print_configuration, print_tokens
 from lib.streaming_response import stream_response
 from lib.user_menu import handle_user_menu
@@ -35,7 +39,7 @@ def main():
     args = parse_arguments()
 
     # Handle --help flag
-    if '--help' in sys.argv:
+    if "--help" in sys.argv:
         return
 
     # Handle --models flag
@@ -84,6 +88,13 @@ def main():
 
     print_configuration(args, requirements)
 
+    try:
+        encoding = tiktoken.encoding_for_model(args.model.split("/")[-1])
+    except Exception as e:
+        print(
+            f"{LIGHT_ORANGE} ⚠️  No model-specific encoding for {args.model}, defaulting to 'cl100k_base'.{RESET_COLOR}"
+        )
+
     user_content = build_prompt(
         args, requirements, startpath, ignore_patterns, []
     )
@@ -99,9 +110,7 @@ def main():
         input_tokens, output_tokens, total_tokens = calculate_token_count(
             args.model, messages
         )
-        print_tokens(
-            input_tokens, output_tokens, total_tokens, args.model
-        )
+        print_tokens(input_tokens, output_tokens, total_tokens, args.model)
 
         proceed = inquirer.confirm(
             message=f"  This will use ~{total_tokens:,} tokens before output - are you sure?",
@@ -118,7 +127,9 @@ def main():
 
         while answers["next_step"] != "🚪 Exit":
             files, streamed_response = stream_response(client, args, messages)
-            answers = handle_user_menu(args, files, messages, streamed_response)
+            answers = handle_user_menu(
+                args, files, messages, streamed_response
+            )
 
     except Exception as e:
         print(f"{LIGHT_ORANGE}An error occurred: {e}{RESET_COLOR}")

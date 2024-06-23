@@ -4,17 +4,19 @@ from .gitignore_parser import is_ignored
 
 from .constants import binary_extensions
 
+# Updated regex to be more inclusive
 file_parse_pattern = re.compile(
-    r"===\.= ==== FILENAME: (?P<filename>.*?) = ===== =========\n```.*?\n(?P<content>.*?)\n```\n===\.= ==== EOF: (?P=filename) = ===== =========",
+    r"===\.= ==== FILENAME: (?P<filename>.*?) = ===== =========\n(?:```(?:.*?)\n)?(?P<content>.*?)\n(?:```\n)?===\.= ==== EOF: (?P=filename) = ===== =========",
     re.DOTALL,
 )
+
 # Define the pattern for the starting token
 middle_of_file_start_pattern = re.compile(
-    r"===\.= ==== FILENAME: .*? = ===== =========\n```(.*?)\n", re.DOTALL
+    r"===\.= ==== FILENAME: .*? = ===== =========\n(?:```.*?\n)?", re.DOTALL
 )
 # Define the pattern for the closing token
 middle_of_file_end_pattern = re.compile(
-    r"===\.= ==== EOF: .*? = ===== =========\n", re.DOTALL
+    r"(?:```\n)?===\.= ==== EOF: .*? = ===== =========\n", re.DOTALL
 )
 
 file_start_token = re.compile(
@@ -172,12 +174,13 @@ def get_files(startpath, ignore_patterns):
     return all_files
 
 
-def parse_files(string):
+def parse_files(string, debug=False):
     """
     Parse files from a given string containing file delimiters and content.
 
     Args:
         string (str): The string containing the file delimiters and content.
+        debug (bool): Flag to enable debug output.
 
     Returns:
         list: List of dictionaries containing filenames and contents.
@@ -187,6 +190,13 @@ def parse_files(string):
         {"filename": match[0].strip(), "contents": match[1].strip()}
         for match in matches
     ]
+    
+    if debug:
+        print(f"Debug: parse_files found {len(files)} files")
+        for file in files:
+            print(f"Debug: Parsed file: {file['filename']}")
+            print(f"Debug: Content preview: {file['contents'][:50]}...")
+    
     return files
 
 
@@ -250,16 +260,30 @@ def calculate_line_difference(filepath, new_content):
         )  # If file does not exist, return total lines as added
 
 
-def write_files(files, base_dir):
+def write_files(files, base_dir, debug=False):
     """
     Write the provided file contents into the specified base directory.
 
     Args:
         files (list): List of files with filenames and contents.
         base_dir (str): The base directory where the files should be written.
+        debug (bool): Flag to enable debug output.
     """
     for file in files:
-        file_path = os.path.join(base_dir, file["filename"])
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(file["contents"])
+        try:
+            file_path = os.path.join(base_dir, file["filename"])
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            
+            if debug:
+                print(f"Debug: Writing file: {file_path}")
+                print(f"Debug: Content preview: {file['contents'][:50]}...")
+            
+            with open(file_path, "w", encoding="utf-8", newline='') as f:
+                f.write(file["contents"])
+            
+            print(f"Successfully wrote file: {file_path}")
+        except Exception as e:
+            print(f"Error writing file {file['filename']}:\n{e}")
+
+    if debug:
+        print(f"Debug: Finished writing {len(files)} files")

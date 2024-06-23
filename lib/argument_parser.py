@@ -12,7 +12,7 @@ ARG_KEYS = [
     "mode",
     "ignore",
     "resources",
-    "token_count_by_file",
+    "debug",
     "models",
 ]
 
@@ -94,11 +94,10 @@ def parse_arguments():
         action=ProvidedAction,
     )
     parser.add_argument(
-        "--token_count_by_file",
+        "--debug",
+        action="store_true",
+        help="Enable debug mode for additional output",
         default=False,
-        type=bool,
-        help="Whether or not to show token count by file (for troubleshooting)",
-        action=ProvidedAction,
     )
     parser.add_argument(
         "--models",
