@@ -95,11 +95,11 @@ def build_prompt(args, requirements, startpath, ignore_patterns, files):
 
         if args.mode == "question":
             prompt_post = QUESTION_PROMPT_POST_TEMPLATE.format(
-                requirements=requirements
+                requirements="\n".join(args.requirements_history)
             )
         else:
             prompt_post = AUTODEV_PROMPT_POST_TEMPLATE.format(
-                requirements=requirements
+                requirements="\n".join(args.requirements_history)
             )
 
         print(prompt_post)

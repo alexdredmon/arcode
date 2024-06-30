@@ -69,8 +69,9 @@ def main():
         print(f"{LIGHT_ORANGE}No requirements provided. Exiting.{RESET_COLOR}")
         return
 
-    # Store the requirements in args
+    # Store the requirements in args and initialize requirements_history
     args.requirements = requirements
+    args.requirements_history = [requirements]
 
     # Parse gitignore
     ignore_patterns = parse_gitignore(
@@ -130,6 +131,10 @@ def main():
             answers = handle_user_menu(
                 args, files, messages, streamed_response
             )
+
+            # If there's a followup prompt, add it to the requirements_history
+            if answers["next_step"] == "💬 Followup prompt":
+                args.requirements_history.append(messages[-1]["content"])
 
     except Exception as e:
         print(f"{LIGHT_ORANGE}An error occurred: {e}{RESET_COLOR}")

@@ -32,10 +32,12 @@ def handle_user_menu(args, files, messages, streamed_response):
             choices.append(f"📄 Copy file {filename}")
 
         if len(files):
-            requirements_text = args.requirements
-            print(
-                f"\n\n{LIGHT_ORANGE} 📃 REQUIREMENTS: {RESET_COLOR}\n{LIGHT_PINK}    > {LIGHT_BLUE}{requirements_text}{RESET_COLOR}"
-            )
+            print(f"\n\n{LIGHT_ORANGE} 📃 REQUIREMENTS: {RESET_COLOR}")
+            for i, req in enumerate(args.requirements_history):
+                if i > 0:
+                    print("")
+                print(f"{LIGHT_PINK}    > {LIGHT_BLUE}{req}{RESET_COLOR}")
+
             print(f"\n\n{LIGHT_ORANGE} 📁 FILES TO UPDATE: {RESET_COLOR}")
 
         # Print file changes
