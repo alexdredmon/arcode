@@ -53,5 +53,12 @@ def get_api_keys(model):
         if not key or not base or not version:
             raise ValueError("AZURE_API_KEY, AZURE_API_BASE, and AZURE_API_VERSION must be set")
         return (key, base, version)
+    elif model.startswith("bedrock/"):
+        key = os.getenv("AWS_ACCESS_KEY_ID", "")
+        secret = os.getenv("AWS_SECRET_ACCESS_KEY", "")
+        region = os.getenv("AWS_REGION_NAME", "")
+        if not key or not secret or not region:
+            raise ValueError("AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_REGION_NAME must be set")
+        return (key, secret, region)
     else:
         raise ValueError(f"Unsupported model provider for model '{model}'")

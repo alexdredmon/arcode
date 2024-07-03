@@ -74,12 +74,14 @@ env:
 For best results, use one of the following models:
 
  - `anthropic/claude-3-5-sonnet-20240620`
+ - `bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0`
  - `openai/gpt-4o`
  - `azure/gpt-4o`
 
 Other popular models include:
 
  - `anthropic/claude-3-opus-20240229`
+ - `bedrock/anthropic.claude-3-opus-20240229-v1:0`
  - `openai/gpt-4`
  - `azure/gpt-4`
 
@@ -104,6 +106,11 @@ Set API keys based on the provider(s) you're using - these values should be pres
  - `AZURE_API_KEY`
  - `AZURE_API_BASE`
  - `AZURE_API_VERSION`
+
+### AWS Bedrock
+ - `AWS_ACCESS_KEY_ID`
+ - `AWS_SECRET_ACCESS_KEY`
+ - `AWS_REGION_NAME`
 
 ## Arguments:
 ```bash

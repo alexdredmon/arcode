@@ -1,4 +1,5 @@
 beautifulsoup4==4.12.3
+boto3>=1.28.57
 inquirerpy==0.3.4
 openai==1.30.5
 pyperclip==1.8.2
@@ -15,4 +16,4 @@ python-dotenv==1.0.0
 dill==0.3.6
 litellm==1.40.19
 tiktoken
-pyinstaller==5.7.0
+pyinstaller==5.12.0
