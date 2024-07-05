@@ -1,6 +1,7 @@
 import os
 import re
 from .gitignore_parser import is_ignored
+import magic
 
 from .constants import binary_extensions
 
@@ -64,7 +65,8 @@ def extract_filename_end(text):
 
 def is_binary_file(filename):
     """
-    Check if a given filename is a binary file based on its extension.
+    Check if a given filename is a binary file based on its extension and MIME type,
+    excluding specific MIME types like application/xhtml+xml and application/xml.
 
     Args:
         filename (str): The filename to check.
@@ -72,8 +74,20 @@ def is_binary_file(filename):
     Returns:
         bool: True if the file is binary, False otherwise.
     """
-    return os.path.splitext(filename)[1].lower() in binary_extensions
+    if os.path.splitext(filename)[1].lower() in binary_extensions:
+        return True
+    magic_obj = magic.Magic(mime=True)
+    mime_type = magic_obj.from_file(filename)
 
+    # Exclude specific MIME types that should not be considered binary
+    excluded_mime_types = ['application/xhtml+xml', 'application/xml']
+    if mime_type in excluded_mime_types:
+        return False
+
+    return ('application/' in mime_type or
+            'image/' in mime_type or
+            'audio/' in mime_type or
+            'video/' in mime_type)
 
 def print_tree(startpath, ignore_patterns, prefix=""):
     """
@@ -100,7 +114,7 @@ def print_tree(startpath, ignore_patterns, prefix=""):
                 os.path.relpath(os.path.join(root, f), startpath),
                 ignore_patterns,
             )
-            and not is_binary_file(f)
+            and not is_binary_file(os.path.relpath(os.path.join(root, f), startpath))
         ]
 
         level = root.replace(startpath, "").count(os.sep)
@@ -150,7 +164,7 @@ def get_files(startpath, ignore_patterns):
                 os.path.relpath(os.path.join(root, f), startpath),
                 ignore_patterns,
             )
-            and not is_binary_file(f)
+            and not is_binary_file(os.path.relpath(os.path.join(root, f), startpath))
         ]
         for f in files:
             file_path = os.path.relpath(os.path.join(root, f), startpath)
