@@ -1,7 +1,7 @@
 beautifulsoup4==4.12.3
 boto3>=1.28.57
 inquirerpy==0.3.4
-openai==1.30.5
+openai==1.35.9
 pyperclip==1.8.2
 langchain==0.2.3
 langchain-community==0.2.4
