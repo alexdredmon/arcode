@@ -18,13 +18,14 @@ from lib.litellm_client import (
     calculate_token_count,
     get_available_models,
 )
-from lib.status import print_configuration, print_tokens
+from lib.status import check_cost_exceeds_maximum, print_configuration, print_tokens
 from lib.streaming_response import stream_response
 from lib.user_menu import handle_user_menu
 from lib.shell_util import (
     LIGHT_ORANGE,
     LIGHT_PINK,
     LIGHT_BLUE,
+    LIGHT_RED,
     RESET_COLOR,
 )
 from lib.prompt_builder import build_prompt
@@ -111,7 +112,11 @@ def main():
         input_tokens, output_tokens, total_tokens = calculate_token_count(
             args.model, messages
         )
-        print_tokens(input_tokens, output_tokens, total_tokens, args.model)
+        total_cost = print_tokens(input_tokens, output_tokens, total_tokens, args.model)
+
+        if check_cost_exceeds_maximum(total_cost, args.maximumEstimatedCost):
+            print(f"{LIGHT_RED}Operation cancelled due to exceeding cost limit.{RESET_COLOR}")
+            return
 
         proceed = inquirer.confirm(
             message=f"  This will use ~{total_tokens:,} tokens before output - are you sure?",

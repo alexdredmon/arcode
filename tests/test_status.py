@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from lib.status import print_configuration, print_tokens
+from lib.status import check_cost_exceeds_maximum, print_configuration, print_tokens
+from io import StringIO
 
 class TestStatus(unittest.TestCase):
 
@@ -16,6 +17,7 @@ class TestStatus(unittest.TestCase):
         mock_args.ignore = ["ignore1", "ignore2"]
         mock_args.mode = "implement"
         mock_args.resources = ["resource1", "resource2"]
+        mock_args.maximumEstimatedCost = 5.0
 
         # Call the function
         print_configuration(mock_args, "Test requirements")
@@ -39,6 +41,34 @@ class TestStatus(unittest.TestCase):
             prompt_tokens=100,
             completion_tokens=200
         )
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_check_cost_exceeds_maximum_true(self, mock_stdout):
+        result = check_cost_exceeds_maximum(10.5, 10.0)
+        self.assertTrue(result)
+        self.assertIn("WARNING: Estimated cost ($10.50) exceeds the maximum allowed cost ($10.00)", mock_stdout.getvalue())
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_check_cost_exceeds_maximum_false(self, mock_stdout):
+        result = check_cost_exceeds_maximum(9.5, 10.0)
+        self.assertFalse(result)
+        self.assertEqual("", mock_stdout.getvalue())
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_check_cost_exceeds_maximum_equal(self, mock_stdout):
+        result = check_cost_exceeds_maximum(10.0, 10.0)
+        self.assertFalse(result)
+        self.assertEqual("", mock_stdout.getvalue())
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_check_cost_exceeds_maximum_zero_maximum(self, mock_stdout):
+        result = check_cost_exceeds_maximum(0.1, 0.0)
+        self.assertTrue(result)
+        self.assertIn("WARNING: Estimated cost ($0.10) exceeds the maximum allowed cost ($0.00)", mock_stdout.getvalue())
+
+    def test_check_cost_exceeds_maximum_negative_cost(self):
+        result = check_cost_exceeds_maximum(-1.0, 10.0)
+        self.assertFalse(result)
 
 if __name__ == '__main__':
     unittest.main()
