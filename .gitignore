@@ -1,5 +1,6 @@
 __pycache__
 venv
+.coverage
 .git
 .DS_Store
 .arcode.cache.pkl
@@ -8,4 +9,5 @@ venv
 .env
 build
 dist
+htmlcov
 arcodeconf.yml
