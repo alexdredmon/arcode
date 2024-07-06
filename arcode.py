@@ -1,18 +1,9 @@
 #!/usr/bin/env python
 
-import os
 import sys
 from InquirerPy import inquirer
 from config import get_api_keys
 from lib.argument_parser import parse_arguments
-from lib.gitignore_parser import parse_gitignore
-from lib.file_util import (
-    print_tree,
-    get_files,
-    format_file_contents,
-    parse_files,
-    write_files,
-)
 from lib.litellm_client import (
     create_litellm_client,
     calculate_token_count,
@@ -74,31 +65,23 @@ def main():
     args.requirements = requirements
     args.requirements_history = [requirements]
 
-    # Parse gitignore
-    ignore_patterns = parse_gitignore(
-        os.path.join(args.dir, ".gitignore"), args.ignore
-    )
-
     # Load API keys only if we have requirements
     try:
         get_api_keys(args.model)
-    except ValueError as e:
-        print(f"{LIGHT_ORANGE}Error: {e}{RESET_COLOR}")
+    except ValueError as error:
+        print(f"{LIGHT_ORANGE}Error: {error}{RESET_COLOR}")
         return
-
-    startpath = args.dir
 
     print_configuration(args, requirements)
 
     try:
         encoding = tiktoken.encoding_for_model(args.model.split("/")[-1])
     except Exception as e:
-        print(
-            f"{LIGHT_ORANGE} ⚠️  No model-specific encoding for {args.model}, defaulting to 'cl100k_base'.{RESET_COLOR}"
-        )
+        print(f"{LIGHT_ORANGE} ⚠️  No model-specific encoding for "
+              f"{args.model}, defaulting to 'cl100k_base'.{RESET_COLOR}")
 
     user_content = build_prompt(
-        args, requirements, startpath, ignore_patterns, []
+        args, requirements, []
     )
 
     messages = [
@@ -141,8 +124,8 @@ def main():
             if answers["next_step"] == "💬 Followup prompt":
                 args.requirements_history.append(messages[-1]["content"])
 
-    except Exception as e:
-        print(f"{LIGHT_ORANGE}An error occurred: {e}{RESET_COLOR}")
+    except Exception as error:
+        print(f"{LIGHT_ORANGE}An error occurred: {error}{RESET_COLOR}")
         return
 
 

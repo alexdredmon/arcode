@@ -1,3 +1,8 @@
+"""
+Module for loading environment variables and validating that API keys for different
+model providers are set.
+"""
+
 import os
 from dotenv import load_dotenv
 
@@ -36,29 +41,30 @@ def get_api_keys(model):
         if not key:
             raise ValueError("OPENAI_API_KEY is not set")
         return key
-    elif model.startswith("anthropic/"):
+    if model.startswith("anthropic/"):
         key = os.getenv("ANTHROPIC_API_KEY", "")
         if not key:
             raise ValueError("ANTHROPIC_API_KEY is not set")
         return key
-    elif model.startswith("gemini/"):
+    if model.startswith("gemini/"):
         key = os.getenv("GEMINI_API_KEY", "")
         if not key:
             raise ValueError("GEMINI_API_KEY is not set")
         return key
-    elif model.startswith("azure/"):
+    if model.startswith("azure/"):
         key = os.getenv("AZURE_API_KEY", "")
         base = os.getenv("AZURE_API_BASE", "")
         version = os.getenv("AZURE_API_VERSION", "")
         if not key or not base or not version:
             raise ValueError("AZURE_API_KEY, AZURE_API_BASE, and AZURE_API_VERSION must be set")
         return (key, base, version)
-    elif model.startswith("bedrock/"):
+    if model.startswith("bedrock/"):
         key = os.getenv("AWS_ACCESS_KEY_ID", "")
         secret = os.getenv("AWS_SECRET_ACCESS_KEY", "")
         region = os.getenv("AWS_REGION_NAME", "")
         if not key or not secret or not region:
-            raise ValueError("AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_REGION_NAME must be set")
+            raise ValueError(
+                "AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_REGION_NAME must be set"
+            )
         return (key, secret, region)
-    else:
-        raise ValueError(f"Unsupported model provider for model '{model}'")
+    raise ValueError(f"Unsupported model provider for model '{model}'")

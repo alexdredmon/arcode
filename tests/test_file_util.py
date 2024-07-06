@@ -54,6 +54,13 @@ class TestFileUtil(unittest.TestCase):
         mock_magic_instance.from_file.return_value = 'application/xhtml+xml'
         self.assertFalse(is_binary_file('test.xhtml'))
 
+        # Test application/js (non-binary)
+        mock_magic_instance.from_file.return_value = 'application/javascript'
+        self.assertFalse(is_binary_file('app.js'))
+
+        # Test application/json (non-binary)
+        mock_magic_instance.from_file.return_value = 'application/json'
+        self.assertFalse(is_binary_file('config.json'))
 
     def test_parse_files(self):
         text = """===.= ==== FILENAME: file1.py = ===== =========

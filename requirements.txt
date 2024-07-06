@@ -18,3 +18,4 @@ litellm==1.41.7
 tiktoken
 pyinstaller==6.8.0
 python-magic
+pathspec
