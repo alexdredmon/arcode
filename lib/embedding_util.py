@@ -48,7 +48,7 @@ def get_top_relevant_files(startpath, upload_filter, query, model_embedding, num
     for root, _, file_list in os.walk(startpath):
         for file in file_list:
             file_path = os.path.join(root, file)
-            if (upload_filter.should_upload(file)):
+            if (upload_filter.should_upload(os.path.relpath(os.path.join(root, file), startpath))):
                 try:
                     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                         content = f.read()

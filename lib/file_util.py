@@ -189,7 +189,7 @@ def get_files(startpath, upload_filter):
         files = [
             f
             for f in files
-            if upload_filter.should_upload(os.path.relpath(os.path.join(root, f)))
+            if upload_filter.should_upload(os.path.relpath(os.path.join(root, f), startpath))
         ]
         for f in files:
             file_path = os.path.relpath(os.path.join(root, f), startpath)
