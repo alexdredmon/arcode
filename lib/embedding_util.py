@@ -2,7 +2,6 @@ import os
 from langchain_community.vectorstores import DocArrayInMemorySearch
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.schema import Document
-from lib.file_util import is_binary_file, is_ignored
 from config import get_api_keys
 from lib.shell_util import (
     RESET_COLOR, WHITE_ON_BLACK, LIGHT_PINK
