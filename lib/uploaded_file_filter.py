@@ -1,7 +1,20 @@
+"""
+This module provides functionality to filter uploaded files based on predefined and custom ignore
+patterns.
+It leverages patterns from a project's .gitignore file, a set of default ignore patterns, and any
+additional patterns provided by the user to determine which files should be excluded from
+processing.
+
+Classes:
+    UploadedFileFilter: Initializes with a starting path and optional additional ignore patterns.
+    It can then be used to filter a list of files, excluding those that match the ignore patterns.
+
+Constants:
+    DEFAULT_IGNORE_PATTERNS: A list of file and directory patterns to be ignored by default.
+"""
 import os
-from os.path import dirname
-from lib.file_util import is_binary_file
 import pathspec
+from lib.file_util import is_binary_file
 
 DEFAULT_IGNORE_PATTERNS = [
     "/.git/",
@@ -18,6 +31,24 @@ DEFAULT_IGNORE_PATTERNS = [
 ]
 
 class UploadedFileFilter:
+    """
+    A class to filter uploaded files based on ignore patterns.
+
+    This class uses ignore patterns from the project's .gitignore file, a set of default ignore
+    patterns, and any additional patterns provided by the user to determine which files should be
+    excluded from processing. It is initialized with a starting path and can optionally include
+    additional ignore patterns.
+
+    Attributes:
+        startpath (str): The starting path from which to filter files.
+        gitignore_path (str): The path to the .gitignore file within the startpath.
+        patterns (List[str]): A list of ignore patterns compiled from the .gitignore file, default
+            ignore patterns, and any additional patterns provided by the user.
+
+    Methods:
+        __init__(self, startpath, additional_patterns=None): Initializes the UploadedFileFilter
+            with a starting path and optional additional ignore patterns.
+    """
     def __init__(self, startpath, additional_patterns=None):
         self.startpath = startpath
         self.gitignore_path = os.path.join(startpath, ".gitignore")
@@ -25,11 +56,12 @@ class UploadedFileFilter:
         self.patterns = []
 
         # Create a List[str] of pattern rules by
-        # 1) Iterating over the lines of the .gitignore file and filtering out empty and comment lines
+        # 1) Iterating over the lines of the .gitignore file and filtering out empty and
+        #    comment lines
         # 2) Adding the default ignore patterns
         # 3) Adding the additional patterns
         if os.path.exists(self.gitignore_path):
-            with open(self.gitignore_path) as ignore_file:
+            with open(self.gitignore_path, 'r', encoding='utf-8') as ignore_file:
                 for line in ignore_file:
                     line = line.rstrip('\n')
                     if line and not line.startswith("#"):
@@ -71,4 +103,3 @@ class UploadedFileFilter:
         if is_binary_file(os.path.join(self.startpath, path)):
             return False
         return True
-

@@ -21,7 +21,7 @@ class TestUploadedFileFilter(unittest.TestCase):
     def test_init_with_gitignore(self, mock_file, mock_exists):
         uff = UploadedFileFilter(self.startpath)
         mock_exists.assert_called_once_with(self.gitignore_path)
-        mock_file.assert_called_once_with(self.gitignore_path)
+        mock_file.assert_called_once_with(self.gitignore_path, 'r', encoding='utf-8')
         self.assertIn("node_modules", uff.patterns)
         self.assertIn("*.log", uff.patterns)
 

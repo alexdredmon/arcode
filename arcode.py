@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import os
 import sys
 from InquirerPy import inquirer
 from config import get_api_keys
@@ -69,8 +68,8 @@ def main():
     # Load API keys only if we have requirements
     try:
         get_api_keys(args.model)
-    except ValueError as e:
-        print(f"{LIGHT_ORANGE}Error: {e}{RESET_COLOR}")
+    except ValueError as error:
+        print(f"{LIGHT_ORANGE}Error: {error}{RESET_COLOR}")
         return
 
     print_configuration(args, requirements)
@@ -78,11 +77,9 @@ def main():
     try:
         encoding = tiktoken.encoding_for_model(args.model.split("/")[-1])
     except Exception as e:
-        print(
-            f"{LIGHT_ORANGE} ⚠️  No model-specific encoding for {args.model}, defaulting to 'cl100k_base'.{RESET_COLOR}"
-        )
+        print(f"{LIGHT_ORANGE} ⚠️  No model-specific encoding for "
+              f"{args.model}, defaulting to 'cl100k_base'.{RESET_COLOR}")
 
-    startpath = args.dir
     user_content = build_prompt(
         args, requirements, []
     )
@@ -127,8 +124,8 @@ def main():
             if answers["next_step"] == "💬 Followup prompt":
                 args.requirements_history.append(messages[-1]["content"])
 
-    except Exception as e:
-        print(f"{LIGHT_ORANGE}An error occurred: {e}{RESET_COLOR}")
+    except Exception as error:
+        print(f"{LIGHT_ORANGE}An error occurred: {error}{RESET_COLOR}")
         return
 
 
