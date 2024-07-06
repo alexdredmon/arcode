@@ -43,7 +43,7 @@ print("Hello world")
 """
 
 QUESTION_PROMPT_PRE = """
-You are a principle software architect and I am going to ask you a question about my codebase. Do not try to make any implementation suggestions unless explicitly requested. Here is my codebase:
+You are a principal software architect and I am going to ask you a question about my codebase. Do not try to make any implementation suggestions unless explicitly requested. Here is my codebase:
 """
 
 QUESTION_PROMPT_POST_TEMPLATE = """
