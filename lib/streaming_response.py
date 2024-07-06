@@ -3,10 +3,10 @@ from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter
 from pygments.util import ClassNotFound
-from lib.file_util import (
+from lib.file_parse_util import parse_files
+from lib.file_type_util import (
     extract_filename_start,
     extract_filename_end,
-    parse_files,
 )
 from lib.shell_util import (
     LIGHT_PINK,

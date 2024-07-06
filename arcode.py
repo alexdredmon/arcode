@@ -9,9 +9,11 @@ from lib.gitignore_parser import parse_gitignore
 from lib.file_util import (
     print_tree,
     get_files,
+    write_files,
+)
+from lib.file_parse_util import (
     format_file_contents,
     parse_files,
-    write_files,
 )
 from lib.litellm_client import (
     create_litellm_client,
