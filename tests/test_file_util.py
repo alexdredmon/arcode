@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch, MagicMock
 from lib.file_util import (
     extract_filename_start,
     extract_filename_end,
@@ -7,6 +8,8 @@ from lib.file_util import (
     is_in_middle_of_file,
     extract_estimated_characters
 )
+import os
+import tempfile
 
 class TestFileUtil(unittest.TestCase):
 
@@ -20,9 +23,37 @@ class TestFileUtil(unittest.TestCase):
         result = extract_filename_end(text)
         self.assertEqual(result, "file1.py")
 
-    def test_is_binary_file(self):
+    def test_is_binary_file_from_extension(self):
+        # These checks should not invoke magic, as they are based on the file extension
         self.assertTrue(is_binary_file("file.jpg"))
-        self.assertFalse(is_binary_file("file.txt"))
+        self.assertTrue(is_binary_file("/some/long/path/app.exe"))
+        self.assertTrue(is_binary_file("/otherpath.png"))
+
+    @patch('magic.Magic')
+    def test_is_binary_file_mime_type(self, mock_magic):
+        mock_magic_instance = MagicMock()
+        mock_magic.return_value = mock_magic_instance
+
+        # Test application/octet-stream (binary)
+        mock_magic_instance.from_file.return_value = 'application/octet-stream'
+        self.assertTrue(is_binary_file('test.bin'))
+
+        # Test text/plain (non-binary)
+        mock_magic_instance.from_file.return_value = 'text/plain'
+        self.assertFalse(is_binary_file('test.txt'))
+
+        # Test application/pdf (binary)
+        mock_magic_instance.from_file.return_value = 'application/pdf'
+        self.assertTrue(is_binary_file('test.pdf'))
+
+        # Test application/xml (non-binary)
+        mock_magic_instance.from_file.return_value = 'application/xml'
+        self.assertFalse(is_binary_file('/some/long/path/test.xml'))
+
+        # Test application/xhtml+xml (non-binary)
+        mock_magic_instance.from_file.return_value = 'application/xhtml+xml'
+        self.assertFalse(is_binary_file('test.xhtml'))
+
 
     def test_parse_files(self):
         text = """===.= ==== FILENAME: file1.py = ===== =========
