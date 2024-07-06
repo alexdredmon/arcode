@@ -141,9 +141,12 @@ options:
                         Additional ignore patterns to use when parsing .gitignore
   --resources [RESOURCES ...]
                         List of URLs to fetch and include in the prompt context
-  --token_count_by_file TOKEN_COUNT_BY_FILE
-                        Whether or not to show token count by file (for troubleshooting)
+  --debug               Enable debug mode for additional output
   --models [MODELS]     List available models. Optionally provide a filter string.
+  --maximumEstimatedCost MAXIMUMESTIMATEDCOST
+                        Maximum estimated cost allowed. Actions with a larger estaimated cost will not be allowed
+                        to execute. (integer or float with up to two decimal places)
+
 ```
 
 ## Install

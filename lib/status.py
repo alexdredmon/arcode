@@ -3,6 +3,7 @@ from lib.shell_util import (
     LIGHT_ORANGE,
     LIGHT_PINK,
     LIGHT_BLUE,
+    LIGHT_RED,
     RESET_COLOR,
 )
 from litellm import cost_per_token
@@ -23,6 +24,7 @@ def print_configuration(args, requirements):
 {LIGHT_PINK}             Ignore: {LIGHT_BLUE}{args.ignore}{RESET_COLOR}
 {LIGHT_PINK}               Mode: {LIGHT_BLUE}{args.mode}{RESET_COLOR}
 {LIGHT_PINK}          Resources: {LIGHT_BLUE}{args.resources}{RESET_COLOR}
+{LIGHT_PINK}   Max Est. Cost($): {LIGHT_BLUE}{args.maximumEstimatedCost:.2f}{RESET_COLOR}
     """
     )
 
@@ -54,3 +56,23 @@ def print_tokens(
 {LIGHT_PINK}    Cost: {LIGHT_GREEN}${total_cost:,.2f}{RESET_COLOR}
 """
         )
+    return total_cost
+
+
+def check_cost_exceeds_maximum(total_cost, maximum_cost):
+    """
+    Check if the estimated cost exceeds the maximum allowed cost.
+
+    Args:
+        total_cost (float): The estimated total cost.
+        maximum_cost (float): The maximum allowed cost.
+
+    Returns:
+        bool: True if the cost exceeds the maximum, False otherwise.
+    """
+    if total_cost > maximum_cost:
+        print(
+            f"\n{LIGHT_RED}⚠️  WARNING: Estimated cost (${total_cost:.2f}) exceeds the maximum allowed cost (${maximum_cost:.2f}).{RESET_COLOR}"
+        )
+        return True
+    return False

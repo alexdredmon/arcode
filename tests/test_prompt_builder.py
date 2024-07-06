@@ -1,9 +1,12 @@
+from io import StringIO
 import unittest
 from unittest.mock import MagicMock, patch
 from lib.prompt_builder import build_prompt
 
 
 class TestPromptBuilder(unittest.TestCase):
+
+    @patch('sys.stdout', new_callable=StringIO)
     @patch("lib.prompt_builder.get_top_relevant_files")
     @patch("lib.prompt_builder.get_files")
     @patch("lib.prompt_builder.print_tree")
@@ -14,6 +17,7 @@ class TestPromptBuilder(unittest.TestCase):
         mock_print_tree,
         mock_get_files,
         mock_get_top_relevant_files,
+        mock_stdout,
     ):
         mock_get_top_relevant_files.return_value = [
             {"path": "file1.py", "data": "Some content"}
