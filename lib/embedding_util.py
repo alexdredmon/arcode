@@ -16,13 +16,13 @@ warnings.filterwarnings("ignore", category=UserWarning, module='pydantic')
 
 EMBEDDINGS_CACHE_DIR = ".arcode.embeddings"
 
-def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, num_files=42):
+def get_top_relevant_files(startpath, upload_filter, query, model_embedding, num_files=42):
     """
     Get the top N relevant files to a given query using embeddings.
 
     Args:
         startpath (str): The starting directory path to scan for files.
-        ignore_patterns (list): List of patterns to ignore during file search.
+        upload_filter (UploadedFileFilter): Filter class to determine if a file should be considered.
         query (str): The query to compare file contents against.
         model_embedding (str): The embedding model to use for comparison.
         num_files (int): Number of most relevant file chunks to retrieve.
@@ -49,11 +49,7 @@ def get_top_relevant_files(startpath, ignore_patterns, query, model_embedding, n
     for root, _, file_list in os.walk(startpath):
         for file in file_list:
             file_path = os.path.join(root, file)
-            if (
-                not is_ignored(file, ignore_patterns)
-                and not is_ignored(file_path, ignore_patterns)
-                and not is_binary_file(file)
-            ):
+            if (upload_filter.should_upload(file)):
                 try:
                     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                         content = f.read()

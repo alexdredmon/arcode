@@ -2,6 +2,7 @@ import os
 import re
 from .gitignore_parser import is_ignored
 import magic
+from collections import defaultdict
 
 from .constants import binary_extensions
 
@@ -80,7 +81,7 @@ def is_binary_file(filename):
     mime_type = magic_obj.from_file(filename)
 
     # Exclude specific MIME types that should not be considered binary
-    excluded_mime_types = ['application/xhtml+xml', 'application/xml']
+    excluded_mime_types = ['application/xhtml+xml', 'application/xml', 'application/json', 'application/javascript']
     if mime_type in excluded_mime_types:
         return False
 
@@ -88,6 +89,34 @@ def is_binary_file(filename):
             'image/' in mime_type or
             'audio/' in mime_type or
             'video/' in mime_type)
+
+def print_files_as_tree(startpath, relative_paths):
+    """
+    Given an unordered iterable of paths, prints the files as an ordered
+    tree relative to the startpath.
+
+    Args:
+        startpath (str): The starting directory path.
+        relative_paths (list): List of relative paths for uploaded files.
+    """
+
+    tree = lambda: defaultdict(tree)
+    root = tree()
+
+    # Build the tree structure
+    for path in relative_paths:
+        parts = path.split(os.sep)
+        current_level = root
+        for part in parts:
+            current_level = current_level[part]
+
+    # Print the tree structure
+    print_tree_structure(root)
+
+def print_tree_structure(root, level=0):
+    for key in sorted(root.keys()):
+        print(' ' * 4 * level + key)
+        print_tree_structure(root[key], level + 1)
 
 def print_tree(startpath, ignore_patterns, prefix=""):
     """
@@ -144,7 +173,7 @@ def format_file_contents(files):
     return contents
 
 
-def get_files(startpath, ignore_patterns):
+def get_files(startpath, upload_filter):
     """
     Retrieve files from the given starting path, ignoring specific patterns and binary files.
 
@@ -160,11 +189,7 @@ def get_files(startpath, ignore_patterns):
         files = [
             f
             for f in files
-            if not is_ignored(
-                os.path.relpath(os.path.join(root, f), startpath),
-                ignore_patterns,
-            )
-            and not is_binary_file(os.path.relpath(os.path.join(root, f), startpath))
+            if upload_filter.should_upload(os.path.relpath(os.path.join(root, f)))
         ]
         for f in files:
             file_path = os.path.relpath(os.path.join(root, f), startpath)
