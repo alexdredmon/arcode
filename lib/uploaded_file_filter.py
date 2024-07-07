@@ -15,6 +15,7 @@ Constants:
 import os
 import pathspec
 from lib.file_io import is_binary_file
+from lib.shell_util import LIGHT_BLUE, LIGHT_PINK, LIGHT_RED, RESET_COLOR
 
 DEFAULT_IGNORE_PATTERNS = [
     "/.git/",
@@ -44,15 +45,15 @@ class UploadedFileFilter:
         gitignore_path (str): The path to the .gitignore file within the startpath.
         patterns (List[str]): A list of ignore patterns compiled from the .gitignore file, default
             ignore patterns, and any additional patterns provided by the user.
+        max_file_size (int): The maximum allowed file size in bytes.
 
     Methods:
-        __init__(self, startpath, additional_patterns=None): Initializes the UploadedFileFilter
-            with a starting path and optional additional ignore patterns.
+        __init__(self, startpath, additional_patterns=None, max_file_size=1000000): Initializes the UploadedFileFilter
+            with a starting path, optional additional ignore patterns, and maximum file size.
     """
     def __init__(self, startpath, additional_patterns=None, max_file_size=1000000):
         self.startpath = startpath
         self.gitignore_path = os.path.join(startpath, ".gitignore")
-        # Create a copy of the default ignore patterns
         self.patterns = []
         self.max_file_size = max_file_size
 
@@ -94,13 +95,21 @@ class UploadedFileFilter:
             file (str): A file path, relative to the start directory.
 
         Returns:
-            bool: True if the file is not excluded by the .gitignore file or any
-                  additional patterns, False otherwise.
+            bool: True if the file is not excluded by the .gitignore file, any
+                  additional patterns, is not a binary file, and does not exceed
+                  the maximum file size limit. False otherwise.
         """
         path = os.path.normpath(file)
+        full_path = os.path.join(self.startpath, path)
+
         if self.spec and self.spec.match_file(path):
             return False
-        #
-        if is_binary_file(os.path.join(self.startpath, path)):
+
+        if is_binary_file(full_path):
             return False
+
+        if os.path.getsize(full_path) > self.max_file_size:
+            print(f" ❗️ {LIGHT_BLUE}Skipping {LIGHT_RED}{full_path}{LIGHT_BLUE}: File size exceeds maximum limit.{RESET_COLOR}")
+            return False
+
         return True

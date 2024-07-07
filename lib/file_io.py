@@ -127,9 +127,6 @@ def get_files(startpath, upload_filter):
             file_path = os.path.relpath(os.path.join(root, f), startpath)
             full_path = os.path.join(root, f)
             try:
-                if os.path.getsize(full_path) > upload_filter.max_file_size:
-                    print(f" ❗️ {LIGHT_PINK}Skipping {LIGHT_GREEN}{file_path}{LIGHT_PINK}: File size exceeds maximum limit.{RESET_COLOR}")
-                    continue
                 with open(
                     full_path,
                     "r",
