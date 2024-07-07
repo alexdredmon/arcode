@@ -9,10 +9,10 @@ class TestArgumentParser(unittest.TestCase):
         args = parse_arguments()
         self.assertEqual(args.dir, 'test_dir')
 
-    @patch('sys.argv', ['arcode', '--autowrite', 'True'])
-    def test_parse_arguments_autowrite(self):
+    @patch('sys.argv', ['arcode', '--auto-write', 'True'])
+    def test_parse_arguments_auto_write(self):
         args = parse_arguments()
-        self.assertTrue(args.autowrite)
+        self.assertTrue(args.auto_write)
 
     @patch('sys.argv', ['arcode', '--focused', '5'])
     def test_parse_arguments_focused(self):

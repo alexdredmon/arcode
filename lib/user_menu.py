@@ -77,7 +77,7 @@ def handle_user_menu(args, files, messages, streamed_response):
         )
         print(f"{LIGHT_ORANGE} ⚡️ ACTION: {RESET_COLOR}")
         exit_menu = False
-        if args.autowrite:
+        if args.auto_write:
             write_files(files, args.dir)
             print(f"\n{LIGHT_ORANGE} ✅ CHANGESET WRITTEN {RESET_COLOR}")
 
@@ -102,7 +102,7 @@ def handle_user_menu(args, files, messages, streamed_response):
                 exit_menu = True
 
     else:
-        if args.autowrite:
+        if args.auto_write:
             write_files(files, args.dir)
             print(f"\n{LIGHT_ORANGE} ✅ CHANGESET WRITTEN {RESET_COLOR}")
 

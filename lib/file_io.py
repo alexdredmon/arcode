@@ -104,11 +104,11 @@ def print_tree(startpath, ignore_patterns, prefix=""):
 
 def get_files(startpath, upload_filter):
     """
-    Retrieve files from the given starting path, ignoring specific patterns and binary files.
+    Retrieve files from the given starting path, ignoring specific patterns, binary files, and files exceeding max size.
 
     Args:
         startpath (str): The starting directory path.
-        ignore_patterns (list): List of patterns to ignore during file search.
+        upload_filter (UploadedFileFilter): Filter object for file upload decisions.
 
     Returns:
         list: List of dictionaries containing file paths and data.
@@ -122,9 +122,13 @@ def get_files(startpath, upload_filter):
         ]
         for f in files:
             file_path = os.path.relpath(os.path.join(root, f), startpath)
+            full_path = os.path.join(root, f)
             try:
+                if os.path.getsize(full_path) > upload_filter.max_file_size:
+                    print(f"Skipping {file_path}: File size exceeds maximum limit.")
+                    continue
                 with open(
-                    os.path.join(root, f),
+                    full_path,
                     "r",
                     encoding="utf-8",
                     errors="ignore",

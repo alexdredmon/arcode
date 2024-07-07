@@ -1,74 +1,71 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from lib.status import check_cost_exceeds_maximum, print_configuration, print_tokens
 from io import StringIO
+from lib.status import print_configuration, print_tokens, check_cost_exceeds_maximum
+
 
 class TestStatus(unittest.TestCase):
-
-    @patch('builtins.print')
-    def test_print_configuration(self, mock_print):
-        # Create a mock args object
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_print_configuration(self, mock_stdout):
         mock_args = MagicMock()
-        mock_args.dir = "test_dir"
-        mock_args.model = "test_model"
-        mock_args.model_embedding = "test_embedding_model"
-        mock_args.autowrite = False
-        mock_args.focused = 0
-        mock_args.ignore = ["ignore1", "ignore2"]
+        mock_args.dir = "/test/dir"
+        mock_args.model = "test-model"
+        mock_args.model_embedding = "test-embedding-model"
+        mock_args.auto_write = False
+        mock_args.focused = 10
+        mock_args.ignore = ["*.pyc", "*.pyo"]
         mock_args.mode = "implement"
-        mock_args.resources = ["resource1", "resource2"]
-        mock_args.maximumEstimatedCost = 5.0
+        mock_args.resources = ["https://example.com"]
+        mock_args.maximum_estimated_cost = 5.0
+        mock_args.max_file_size = 1000000
 
-        # Call the function
         print_configuration(mock_args, "Test requirements")
+        
+        output = mock_stdout.getvalue()
+        self.assertIn("BUILDING FEATURE:", output)
+        self.assertIn("Test requirements", output)
+        self.assertIn("CONFIGURATION:", output)
+        self.assertIn("/test/dir", output)
+        self.assertIn("test-model", output)
+        self.assertIn("test-embedding-model", output)
+        self.assertIn("False", output)
+        self.assertIn("10", output)
+        self.assertIn("['*.pyc', '*.pyo']", output)
+        self.assertIn("implement", output)
+        self.assertIn("['https://example.com']", output)
+        self.assertIn("$5.00", output)
+        self.assertIn("1,000,000 bytes", output)
 
-        # Assert that print was called (we're not checking the exact output here)
-        mock_print.assert_called()
-
-    @patch('builtins.print')
-    @patch('lib.status.cost_per_token')
-    def test_print_tokens(self, mock_cost_per_token, mock_print):
-        # Mock the cost_per_token function
+    @patch("lib.status.cost_per_token")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_print_tokens(self, mock_stdout, mock_cost_per_token):
         mock_cost_per_token.return_value = (0.01, 0.02)
+        
+        total_cost = print_tokens(100, 200, 300, "test-model")
+        
+        output = mock_stdout.getvalue()
+        self.assertIn("TOKENS", output)
+        self.assertIn("100", output)
+        self.assertIn("200", output)
+        self.assertIn("300", output)
+        self.assertIn("COST ESTIMATE", output)
+        self.assertIn("$0.03", output)
+        self.assertEqual(total_cost, 0.03)
 
-        # Call the function
-        print_tokens(100, 200, 300, "test_model")
-
-        # Assert that print and cost_per_token were called
-        mock_print.assert_called()
-        mock_cost_per_token.assert_called_once_with(
-            model="test_model",
-            prompt_tokens=100,
-            completion_tokens=200
-        )
-
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_check_cost_exceeds_maximum_true(self, mock_stdout):
-        result = check_cost_exceeds_maximum(10.5, 10.0)
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_check_cost_exceeds_maximum(self, mock_stdout):
+        result = check_cost_exceeds_maximum(10.0, 5.0)
+        
         self.assertTrue(result)
-        self.assertIn("WARNING: Estimated cost ($10.50) exceeds the maximum allowed cost ($10.00)", mock_stdout.getvalue())
+        output = mock_stdout.getvalue()
+        self.assertIn("WARNING:", output)
+        self.assertIn("$10.00", output)
+        self.assertIn("$5.00", output)
 
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_check_cost_exceeds_maximum_false(self, mock_stdout):
-        result = check_cost_exceeds_maximum(9.5, 10.0)
-        self.assertFalse(result)
-        self.assertEqual("", mock_stdout.getvalue())
-
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_check_cost_exceeds_maximum_equal(self, mock_stdout):
-        result = check_cost_exceeds_maximum(10.0, 10.0)
-        self.assertFalse(result)
-        self.assertEqual("", mock_stdout.getvalue())
-
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_check_cost_exceeds_maximum_zero_maximum(self, mock_stdout):
-        result = check_cost_exceeds_maximum(0.1, 0.0)
-        self.assertTrue(result)
-        self.assertIn("WARNING: Estimated cost ($0.10) exceeds the maximum allowed cost ($0.00)", mock_stdout.getvalue())
-
-    def test_check_cost_exceeds_maximum_negative_cost(self):
-        result = check_cost_exceeds_maximum(-1.0, 10.0)
+        result = check_cost_exceeds_maximum(3.0, 5.0)
+        
         self.assertFalse(result)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

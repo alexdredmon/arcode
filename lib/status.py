@@ -11,21 +11,19 @@ from litellm import cost_per_token
 
 def print_configuration(args, requirements):
     print(
-        f"""
-{LIGHT_ORANGE} 🏗️  BUILDING FEATURE: {RESET_COLOR}
-{LIGHT_PINK}    > {LIGHT_BLUE}{requirements}{RESET_COLOR}
-
-{LIGHT_ORANGE} ⚙️  CONFIGURATION: {RESET_COLOR}
-{LIGHT_PINK}          Directory: {LIGHT_BLUE}{args.dir}{RESET_COLOR}
-{LIGHT_PINK}              Model: {LIGHT_BLUE}{args.model}{RESET_COLOR}
-{LIGHT_PINK}    Embedding Model: {LIGHT_BLUE}{args.model_embedding}{RESET_COLOR}
-{LIGHT_PINK}         Auto-write: {LIGHT_BLUE}{args.autowrite}{RESET_COLOR}
-{LIGHT_PINK}            Focused: {LIGHT_BLUE}{args.focused}{RESET_COLOR}
-{LIGHT_PINK}             Ignore: {LIGHT_BLUE}{args.ignore}{RESET_COLOR}
-{LIGHT_PINK}               Mode: {LIGHT_BLUE}{args.mode}{RESET_COLOR}
-{LIGHT_PINK}          Resources: {LIGHT_BLUE}{args.resources}{RESET_COLOR}
-{LIGHT_PINK}   Max Est. Cost($): {LIGHT_BLUE}{args.maximumEstimatedCost:.2f}{RESET_COLOR}
-    """
+        LIGHT_ORANGE + " 🏗️  BUILDING FEATURE: " + RESET_COLOR + "\n" +
+        LIGHT_PINK + "    > " + LIGHT_BLUE + str(requirements) + RESET_COLOR + "\n\n" +
+        LIGHT_ORANGE + " ⚙️  CONFIGURATION: " + RESET_COLOR + "\n" +
+        LIGHT_PINK + "          Directory: " + LIGHT_BLUE + str(args.dir) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "              Model: " + LIGHT_BLUE + str(args.model) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "    Embedding Model: " + LIGHT_BLUE + str(args.model_embedding) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "         Auto-write: " + LIGHT_BLUE + str(args.auto_write) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "            Focused: " + LIGHT_BLUE + str(args.focused) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "             Ignore: " + LIGHT_BLUE + str(args.ignore) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "               Mode: " + LIGHT_BLUE + str(args.mode) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "          Resources: " + LIGHT_BLUE + str(args.resources) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "      Max Est. Cost: " + LIGHT_BLUE + "${:.2f}".format(args.maximum_estimated_cost) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "      Max File Size: " + LIGHT_BLUE + "{:,} bytes".format(args.max_file_size) + RESET_COLOR + "\n"
     )
 
 
