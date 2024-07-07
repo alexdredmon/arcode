@@ -92,7 +92,8 @@ def build_fileset(args, requirements):
     # Build uploaded file filter
     upload_filter = UploadedFileFilter(
         startpath,
-        args.ignore
+        args.ignore,
+        args.max_file_size
     )
 
     all_files = get_files(startpath, upload_filter)

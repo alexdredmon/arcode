@@ -12,6 +12,9 @@ from .file_parser import (
     is_in_middle_of_file,
     extract_estimated_characters
 )
+from .shell_util import (
+    LIGHT_PINK, LIGHT_GREEN, RESET_COLOR
+)
 
 def is_binary_file(filename):
     """
@@ -125,7 +128,7 @@ def get_files(startpath, upload_filter):
             full_path = os.path.join(root, f)
             try:
                 if os.path.getsize(full_path) > upload_filter.max_file_size:
-                    print(f"Skipping {file_path}: File size exceeds maximum limit.")
+                    print(f" ❗️ {LIGHT_PINK}Skipping {LIGHT_GREEN}{file_path}{LIGHT_PINK}: File size exceeds maximum limit.{RESET_COLOR}")
                     continue
                 with open(
                     full_path,
