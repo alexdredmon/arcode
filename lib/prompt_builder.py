@@ -3,7 +3,7 @@ import os
 import requests
 from contextlib import redirect_stdout
 from bs4 import BeautifulSoup
-from lib.file_util import get_files, print_files_as_tree, format_file_contents
+from lib.file_io import get_files, print_files_as_tree, format_file_contents
 from lib.prompt_templates import (
     QUESTION_PROMPT_PRE,
     AUTODEV_PROMPT_PRE,

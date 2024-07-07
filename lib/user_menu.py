@@ -1,9 +1,12 @@
 from InquirerPy import prompt
 import pyperclip
 import os
-from lib.file_util import (
+from lib.file_io import (
     calculate_line_difference,
     write_files,
+)
+from lib.file_parser import (
+    format_file_contents,
 )
 from lib.litellm_client import calculate_token_count
 from lib.shell_util import (

@@ -14,7 +14,7 @@ Constants:
 """
 import os
 import pathspec
-from lib.file_util import is_binary_file
+from lib.file_io import is_binary_file
 
 DEFAULT_IGNORE_PATTERNS = [
     "/.git/",
