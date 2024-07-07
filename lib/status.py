@@ -10,6 +10,11 @@ from litellm import cost_per_token
 
 
 def print_configuration(args, requirements):
+    try:
+        max_cost = "${:.2f}".format(float(args.max_estimated_cost))
+    except (ValueError, TypeError):
+        max_cost = "N/A"
+
     print(
         LIGHT_ORANGE + " 🏗️  BUILDING FEATURE: " + RESET_COLOR + "\n" +
         LIGHT_PINK + "    > " + LIGHT_BLUE + str(requirements) + RESET_COLOR + "\n\n" +
@@ -22,7 +27,7 @@ def print_configuration(args, requirements):
         LIGHT_PINK + "             Ignore: " + LIGHT_BLUE + str(args.ignore) + RESET_COLOR + "\n" +
         LIGHT_PINK + "               Mode: " + LIGHT_BLUE + str(args.mode) + RESET_COLOR + "\n" +
         LIGHT_PINK + "          Resources: " + LIGHT_BLUE + str(args.resources) + RESET_COLOR + "\n" +
-        LIGHT_PINK + "      Max Est. Cost: " + LIGHT_BLUE + "${:.2f}".format(args.maximum_estimated_cost) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "      Max Est. Cost: " + LIGHT_BLUE + max_cost + RESET_COLOR + "\n" +
         LIGHT_PINK + "      Max File Size: " + LIGHT_BLUE + "{:,} bytes".format(args.max_file_size) + RESET_COLOR + "\n"
     )
 

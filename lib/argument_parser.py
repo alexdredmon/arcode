@@ -14,7 +14,7 @@ ARG_KEYS = [
     "resources",
     "debug",
     "models",
-    "maximum-estimated-cost",
+    "max-estimated-cost",
     "max-file-size",
 ]
 
@@ -109,7 +109,7 @@ def parse_arguments():
         action=ProvidedAction,
     )
     parser.add_argument(
-        "--maximum-estimated-cost",
+        "--max-estimated-cost",
         type=float,
         default=5.0,
         help="Maximum estimated cost allowed. Actions with a larger estimated cost will not be allowed to execute. (integer or float with up to two decimal places)",
@@ -129,9 +129,9 @@ def parse_arguments():
 
     cli_args = parser.parse_args()
 
-    # Validate maximum-estimated-cost
-    if cli_args.maximum_estimated_cost < 0 or round(cli_args.maximum_estimated_cost, 2) != cli_args.maximum_estimated_cost:
-        parser.error("maximum-estimated-cost must be a non-negative number with at most two decimal places")
+    # Validate max-estimated-cost
+    if cli_args.max_estimated_cost < 0 or round(cli_args.max_estimated_cost, 2) != cli_args.max_estimated_cost:
+        parser.error("max-estimated-cost must be a non-negative number with at most two decimal places")
 
     # First check for the global configuration file
     global_config_path = os.path.expanduser("~/.config/arcodeconf.yml")

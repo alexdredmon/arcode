@@ -117,6 +117,7 @@ Set API keys based on the provider(s) you're using - these values should be pres
 usage: arcode [-h] [--dir DIR] [--autowrite AUTOWRITE] [--focused FOCUSED] [--model MODEL]
                  [--model_embedding MODEL_EMBEDDING] [--mode {implement,question}] [--ignore [IGNORE ...]]
                  [--resources [RESOURCES ...]] [--token_count_by_file TOKEN_COUNT_BY_FILE] [--models [MODELS]]
+                 [--max-estimated-cost MAX_ESTIMATED_COST]
                  [requirements ...]
 
 positional arguments:
@@ -143,8 +144,8 @@ options:
                         List of URLs to fetch and include in the prompt context
   --debug               Enable debug mode for additional output
   --models [MODELS]     List available models. Optionally provide a filter string.
-  --maximumEstimatedCost MAXIMUMESTIMATEDCOST
-                        Maximum estimated cost allowed. Actions with a larger estaimated cost will not be allowed
+  --max-estimated-cost MAX_ESTIMATED_COST
+                        Maximum estimated cost allowed. Actions with a larger estimated cost will not be allowed
                         to execute. (integer or float with up to two decimal places)
 
 ```
