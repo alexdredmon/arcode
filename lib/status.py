@@ -27,13 +27,14 @@ def print_configuration(args, requirements):
         LIGHT_PINK + "             Ignore: " + LIGHT_BLUE + str(args.ignore) + RESET_COLOR + "\n" +
         LIGHT_PINK + "               Mode: " + LIGHT_BLUE + str(args.mode) + RESET_COLOR + "\n" +
         LIGHT_PINK + "          Resources: " + LIGHT_BLUE + str(args.resources) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "           Image(s): " + LIGHT_BLUE + str(args.images) + RESET_COLOR + "\n" +
         LIGHT_PINK + "      Max Est. Cost: " + LIGHT_GREEN + max_cost + RESET_COLOR + "\n" +
         LIGHT_PINK + "      Max File Size: " + LIGHT_BLUE + "{:,} bytes".format(args.max_file_size) + RESET_COLOR + "\n"
     )
 
 
 def print_tokens(
-    input_tokens, output_tokens, total_tokens, model
+    input_tokens, output_tokens, content_tokens, image_tokens, total_tokens, model
 ):
     (
         input_cost,
@@ -48,9 +49,10 @@ def print_tokens(
     print(
         f"""
 {LIGHT_ORANGE} 🧮 TOKENS{RESET_COLOR}
-    {LIGHT_PINK}   In: {LIGHT_BLUE}{input_tokens:,}{RESET_COLOR}
-    {LIGHT_PINK}  Out: {LIGHT_BLUE}{output_tokens:,}{RESET_COLOR}
-    {LIGHT_PINK}Total: {LIGHT_BLUE}{total_tokens:,}{RESET_COLOR}"""
+    {LIGHT_PINK}Content: {LIGHT_BLUE}{content_tokens:,}{RESET_COLOR}
+    {LIGHT_PINK} Images: {LIGHT_BLUE}{image_tokens:,}{RESET_COLOR}
+    {LIGHT_PINK}     In: {LIGHT_BLUE}{input_tokens:,}{RESET_COLOR}
+    {LIGHT_PINK}    Out: {LIGHT_BLUE}{output_tokens:,}{RESET_COLOR}"""
     )
     if total_cost:
         print(

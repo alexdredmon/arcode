@@ -20,7 +20,8 @@ from lib.shell_util import (
     RESET_COLOR,
 )
 from lib.prompt_builder import build_prompt
-
+from lib.image_util import calculate_image_token_cost
+import tiktoken
 
 def main():
     """
@@ -77,25 +78,38 @@ def main():
     try:
         encoding = tiktoken.encoding_for_model(args.model.split("/")[-1])
     except Exception as e:
-        print(f"{LIGHT_ORANGE} ⚠️  No model-specific encoding for "
+        print(f"{LIGHT_BLUE} ⚠️  No model-specific encoding for "
               f"{args.model}, defaulting to 'cl100k_base'.{RESET_COLOR}")
+        encoding = tiktoken.get_encoding("cl100k_base")
+    args.encoding = encoding
 
-    user_content = build_prompt(
-        args, requirements, []
-    )
+    user_content = build_prompt(args, requirements, [])
 
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": user_content},
+        {"role": "user", "content": format_content_for_litellm(user_content)}
     ]
 
     client = create_litellm_client(args.model)
 
+    # Calculate image token costs
+    total_image_tokens = 0
+    if args.images:
+        print(f"\n{LIGHT_ORANGE} 🖼️  IMAGES: {RESET_COLOR}")
+        for image_path in args.images:
+            image_tokens = calculate_image_token_cost(image_path, encoding)
+            total_image_tokens += image_tokens
+            print(f"    {LIGHT_PINK}* {LIGHT_BLUE}{image_path} {LIGHT_ORANGE}({image_tokens:,} tokens){RESET_COLOR}")
+        print(f"    {LIGHT_PINK}Total image tokens: {LIGHT_BLUE}{total_image_tokens:,}{RESET_COLOR}")
+
+
     try:
-        input_tokens, output_tokens, total_tokens = calculate_token_count(
-            args.model, messages
+        input_tokens, output_tokens, content_tokens = calculate_token_count(
+            args.model, messages, encoding
         )
-        total_cost = print_tokens(input_tokens, output_tokens, total_tokens, args.model)
+        input_tokens += total_image_tokens  # Include image tokens in input count
+        total_tokens = content_tokens + total_image_tokens
+        total_cost = print_tokens(input_tokens, output_tokens, content_tokens, total_image_tokens, total_tokens, args.model)
 
         if check_cost_exceeds_maximum(total_cost, args.max_estimated_cost):
             print(f"{LIGHT_RED}Operation cancelled due to exceeding cost limit.{RESET_COLOR}")
@@ -128,6 +142,23 @@ def main():
         print(f"{LIGHT_ORANGE}An error occurred: {error}{RESET_COLOR}")
         return
 
+def format_content_for_litellm(content):
+    """
+    Format the content returned by build_prompt for LiteLLM.
+    
+    Args:
+        content (list): List of content items returned by build_prompt.
+        
+    Returns:
+        list: Formatted content for LiteLLM.
+    """
+    formatted_content = []
+    for item in content:
+        if item["type"] == "text":
+            formatted_content.append({"type": "text", "text": item["text"]})
+        elif item["type"] == "image_url":
+            formatted_content.append({"type": "image_url", "image_url": item["image_url"]})
+    return formatted_content
 
 if __name__ == "__main__":
     main()

@@ -18,6 +18,8 @@ from lib.shell_util import (
     LIGHT_RED,
     RESET_COLOR,
 )
+import tiktoken
+from lib.litellm_client import calculate_token_count
 
 
 def stream_response(client, args, messages):
@@ -36,6 +38,17 @@ def stream_response(client, args, messages):
     streamed_response = ""
 
     try:
+        # Create encoding object
+        try:
+            encoding = tiktoken.encoding_for_model(args.model.split("/")[-1])
+        except Exception as e:
+            print(f"{LIGHT_BLUE} ⚠️  No model-specific encoding for "
+                  f"{args.model}, defaulting to 'cl100k_base'.{RESET_COLOR}")
+            encoding = tiktoken.get_encoding("cl100k_base")
+
+        # Calculate tokens before streaming
+        input_tokens, _, _ = calculate_token_count(args.model, messages, encoding)
+
         completion = client(model=args.model, messages=messages, stream=True)
 
         print(f"\n{LIGHT_ORANGE} 🌐 STREAMING RESPONSE: {RESET_COLOR}\n")
@@ -137,5 +150,8 @@ def stream_response(client, args, messages):
 
     files = parse_files(streamed_response)
     messages.append({"role": "assistant", "content": streamed_response})
+
+    # Calculate output tokens after streaming
+    _, output_tokens, total_tokens = calculate_token_count(args.model, messages, encoding)
 
     return files, streamed_response

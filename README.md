@@ -142,6 +142,8 @@ options:
                         Additional ignore patterns to use when parsing .gitignore
   --resources [RESOURCES ...]
                         List of URLs to fetch and include in the prompt context
+  --images [IMAGES ...]
+                        List of image file paths to include in the prompt context
   --debug               Enable debug mode for additional output
   --models [MODELS]     List available models. Optionally provide a filter string.
   --max-estimated-cost MAX_ESTIMATED_COST
@@ -153,11 +155,12 @@ options:
 ## Install
 
 1. Ensure [Homebrew](https://brew.sh/) is installed
-2. Tap `alexdredmon/arcode`
+2. Ensure `libmagic` is installed (or run `brew install libmagic`)
+3. Tap `alexdredmon/arcode`
     ```bash
     brew tap alexdredmon/arcode
     ```
-3. Install arcode
+4. Install arcode
     ```bash
     brew install arcode
     ```

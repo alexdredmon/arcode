@@ -103,33 +103,35 @@ def create_litellm_client_embeddings(
     return LitellmEmbeddings(model, api_key, api_base, api_version)
 
 
-def calculate_token_count(model, messages):
+def calculate_token_count(model, messages, encoding):
     """
     Calculate the token count for the input and output.
 
     Args:
         model (str): The model to be used.
         messages (list): List of messages.
+        encoding (tiktoken.Encoding): The encoding to use for token counting.
 
     Returns:
         tuple: Total input tokens, total output tokens, and combined total tokens.
     """
-    try:
-        encoding = tiktoken.encoding_for_model(model.split("/")[-1])
-    except Exception as e:
-        encoding = tiktoken.get_encoding("cl100k_base")
-
     total_input = 0
     total_output = 0
     for message in messages:
         if message["role"] == "user":
-            total_input += len(
-                encoding.encode(message["content"], disallowed_special=())
-            )
+            if isinstance(message["content"], list):
+                for content_item in message["content"]:
+                    if content_item["type"] == "text":
+                        total_input += len(encoding.encode(content_item["text"], disallowed_special=()))
+            else:
+                total_input += len(encoding.encode(message["content"], disallowed_special=()))
         else:
-            total_output += len(
-                encoding.encode(message["content"], disallowed_special=())
-            )
+            if isinstance(message["content"], list):
+                for content_item in message["content"]:
+                    if content_item["type"] == "text":
+                        total_output += len(encoding.encode(content_item["text"], disallowed_special=()))
+            else:
+                total_output += len(encoding.encode(message["content"], disallowed_special=()))
     return total_input, total_output, total_input + total_output
 
 
