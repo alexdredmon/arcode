@@ -1,11 +1,13 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from lib.file_util import (
+from lib.file_parser import (
     extract_filename_start,
     extract_filename_end,
-    is_binary_file,
     parse_files,
     is_in_middle_of_file,
+)
+from lib.file_io import (
+    is_binary_file,
     extract_estimated_characters
 )
 import os

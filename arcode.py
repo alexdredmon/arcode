@@ -97,7 +97,7 @@ def main():
         )
         total_cost = print_tokens(input_tokens, output_tokens, total_tokens, args.model)
 
-        if check_cost_exceeds_maximum(total_cost, args.maximumEstimatedCost):
+        if check_cost_exceeds_maximum(total_cost, args.max_estimated_cost):
             print(f"{LIGHT_RED}Operation cancelled due to exceeding cost limit.{RESET_COLOR}")
             return
 

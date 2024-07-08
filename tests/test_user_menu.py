@@ -23,7 +23,7 @@ class TestUserMenu(unittest.TestCase):
         mock_args.model = "test_model"
         mock_args.mode = "implement"
         mock_args.requirements_history = ["Test requirement"]
-        mock_args.autowrite = False
+        mock_args.auto_write = False
         mock_args.maximumEstimatedCost = 5.0
 
         mock_files = [{"filename": "test.py", "contents": "print('test')"}]

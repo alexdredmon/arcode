@@ -1,9 +1,12 @@
 from InquirerPy import prompt
 import pyperclip
 import os
-from lib.file_util import (
+from lib.file_io import (
     calculate_line_difference,
     write_files,
+)
+from lib.file_parser import (
+    format_file_contents,
 )
 from lib.litellm_client import calculate_token_count
 from lib.shell_util import (
@@ -74,7 +77,7 @@ def handle_user_menu(args, files, messages, streamed_response):
         )
         print(f"{LIGHT_ORANGE} ⚡️ ACTION: {RESET_COLOR}")
         exit_menu = False
-        if args.autowrite:
+        if args.auto_write:
             write_files(files, args.dir)
             print(f"\n{LIGHT_ORANGE} ✅ CHANGESET WRITTEN {RESET_COLOR}")
 
@@ -99,7 +102,7 @@ def handle_user_menu(args, files, messages, streamed_response):
                 exit_menu = True
 
     else:
-        if args.autowrite:
+        if args.auto_write:
             write_files(files, args.dir)
             print(f"\n{LIGHT_ORANGE} ✅ CHANGESET WRITTEN {RESET_COLOR}")
 

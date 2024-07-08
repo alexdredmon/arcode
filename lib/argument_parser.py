@@ -5,16 +5,17 @@ from config import load_env_vars_from_config
 
 ARG_KEYS = [
     "dir",
-    "autowrite",
+    "auto-write",
     "focused",
     "model",
-    "model_embedding",
+    "model-embedding",
     "mode",
     "ignore",
     "resources",
     "debug",
     "models",
-    "maximumEstimatedCost",
+    "max-estimated-cost",
+    "max-file-size",
 ]
 
 
@@ -38,10 +39,10 @@ def parse_arguments():
         action=ProvidedAction,
     )
     parser.add_argument(
-        "--autowrite",
+        "--auto-write",
         type=bool,
         default=False,
-        help="Whether or not to immediately write the changeset.  Useful when piping to arcode, e.g. cat feature.txt | arcode",
+        help="Whether or not to immediately write the changeset. Useful when piping to arcode, e.g. cat feature.txt | arcode",
         action=ProvidedAction,
     )
     parser.add_argument(
@@ -59,7 +60,7 @@ def parse_arguments():
         action=ProvidedAction,
     )
     parser.add_argument(
-        "--model_embedding",
+        "--model-embedding",
         type=str,
         default="openai/text-embedding-3-small",
         help="LLM provider/model to use for embeddings with LiteLLM, default to openai/text-embedding-3-small.",
@@ -108,10 +109,17 @@ def parse_arguments():
         action=ProvidedAction,
     )
     parser.add_argument(
-        "--maximumEstimatedCost",
+        "--max-estimated-cost",
         type=float,
         default=5.0,
-        help="Maximum estimated cost allowed. Actions with a larger estaimated cost will not be allowed to execute. (integer or float with up to two decimal places)",
+        help="Maximum estimated cost allowed. Actions with a larger estimated cost will not be allowed to execute. (integer or float with up to two decimal places)",
+        action=ProvidedAction,
+    )
+    parser.add_argument(
+        "--max-file-size",
+        type=int,
+        default=1000000,  # 1 MB default
+        help="Maximum file size in bytes for files to be included in the prompt.",
         action=ProvidedAction,
     )
 
@@ -121,9 +129,9 @@ def parse_arguments():
 
     cli_args = parser.parse_args()
 
-    # Validate maximumEstimatedCost
-    if cli_args.maximumEstimatedCost < 0 or round(cli_args.maximumEstimatedCost, 2) != cli_args.maximumEstimatedCost:
-        parser.error("maximumEstimatedCost must be a non-negative number with at most two decimal places")
+    # Validate max-estimated-cost
+    if cli_args.max_estimated_cost < 0 or round(cli_args.max_estimated_cost, 2) != cli_args.max_estimated_cost:
+        parser.error("max-estimated-cost must be a non-negative number with at most two decimal places")
 
     # First check for the global configuration file
     global_config_path = os.path.expanduser("~/.config/arcodeconf.yml")
@@ -148,11 +156,17 @@ def load_configurations(cli_args, config_path):
             config_args = config.get("args", {})
             if config_args:
                 for key in ARG_KEYS:
+                    # Convert kebab-case to snake_case for compatibility
+                    snake_key = key.replace("-", "_")
                     # Only load config value if user has not provided it
                     if key in config_args and not getattr(
-                        cli_args, f"{key}_provided", False
+                        cli_args, f"{snake_key}_provided", False
                     ):
-                        setattr(cli_args, key, config_args.get(key))
+                        setattr(cli_args, snake_key, config_args.get(key))
+                    elif snake_key in config_args and not getattr(
+                        cli_args, f"{snake_key}_provided", False
+                    ):
+                        setattr(cli_args, snake_key, config_args.get(snake_key))
 
             env_args = config.get("env", {})
             if env_args:
