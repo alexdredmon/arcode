@@ -54,22 +54,17 @@ class UploadedFileFilter:
     def __init__(self, startpath, additional_patterns=None, max_file_size=1000000):
         self.startpath = startpath
         self.gitignore_path = os.path.join(startpath, ".gitignore")
-        self.patterns = []
+        self.patterns = DEFAULT_IGNORE_PATTERNS.copy()
         self.max_file_size = max_file_size
 
-        # Create a List[str] of pattern rules by
-        # 1) Iterating over the lines of the .gitignore file and filtering out empty and
-        #    comment lines
-        # 2) Adding the default ignore patterns
-        # 3) Adding the additional patterns
+        # Add patterns from .gitignore if it exists
         if os.path.exists(self.gitignore_path):
             with open(self.gitignore_path, 'r', encoding='utf-8') as ignore_file:
                 for line in ignore_file:
-                    line = line.rstrip('\n')
+                    line = line.strip()
                     if line and not line.startswith("#"):
                         self.patterns.append(line)
 
-        self.patterns.extend(DEFAULT_IGNORE_PATTERNS)
         if additional_patterns:
             self.patterns.extend(additional_patterns)
 
