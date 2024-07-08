@@ -15,10 +15,17 @@ class TestLitellmClient(unittest.TestCase):
         mock_encode = MagicMock()
         mock_encode.encode.return_value = [1, 2, 3]
         mock_get_encoding.return_value = mock_encode
-        input_tokens, output_tokens, total_tokens = calculate_token_count("model", [{"role": "user", "content": "hello"}])
-        self.assertEqual(input_tokens, 3)
-        self.assertEqual(output_tokens, 0)
-        self.assertEqual(total_tokens, 3)
+        
+        # Create a mock encoding object
+        mock_encoding = MagicMock()
+        mock_encoding.encode.return_value = [1, 2, 3]
+        
+        token_counts = calculate_token_count("model", [{"role": "user", "content": "hello"}], mock_encoding)
+        
+        self.assertEqual(token_counts["content_tokens"], 3)
+        self.assertEqual(token_counts["input_tokens"], 3)
+        self.assertEqual(token_counts["output_tokens"], 0)
+        self.assertEqual(token_counts["total_tokens"], 3)
 
 if __name__ == '__main__':
     unittest.main()
