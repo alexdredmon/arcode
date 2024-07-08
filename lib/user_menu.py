@@ -8,7 +8,6 @@ from lib.file_io import (
 from lib.file_parser import (
     format_file_contents,
 )
-from lib.litellm_client import calculate_token_count
 from lib.shell_util import (
     LIGHT_PINK,
     LIGHT_BLUE,
@@ -16,8 +15,7 @@ from lib.shell_util import (
     LIGHT_ORANGE,
     RESET_COLOR,
 )
-from lib.status import print_tokens
-from lib.image_util import calculate_image_token_cost
+from lib.token_counter import get_token_counts, print_token_counts
 import sys
 
 
@@ -67,21 +65,8 @@ def handle_user_menu(args, files, messages, streamed_response):
             }
         ]
 
-        input_tokens, output_tokens, total_tokens = calculate_token_count(
-            args.model, messages, args.encoding
-        )
-
-        # Calculate total image tokens
-        total_image_tokens = sum(calculate_image_token_cost(image, args.encoding) for image in args.images) if args.images else 0
-
-        print_tokens(
-            input_tokens,
-            output_tokens,
-            total_tokens,
-            total_tokens,  # Passing total_tokens as the content_tokens argument
-            total_image_tokens,  # Passing the calculated total_image_tokens
-            args.model
-        )
+        get_token_counts(messages)
+        print_token_counts()
         print(f"{LIGHT_ORANGE} ⚡️ ACTION: {RESET_COLOR}")
         exit_menu = False
         if args.auto_write:

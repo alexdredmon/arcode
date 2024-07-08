@@ -33,26 +33,32 @@ def print_configuration(args, requirements):
     )
 
 
-def print_tokens(
-    input_tokens, output_tokens, content_tokens, image_tokens, total_tokens, model
-):
-    (
-        input_cost,
-        output_cost,
-    ) = cost_per_token(
+def print_tokens(token_counts):
+    """
+    Print token counts and estimated cost.
+
+    Args:
+        token_counts (dict): A dictionary containing token counts and model information.
+
+    Returns:
+        float: The total estimated cost.
+    """
+    model = token_counts['model']
+    input_cost, output_cost = cost_per_token(
         model=model,
-        prompt_tokens=input_tokens,
-        completion_tokens=output_tokens,
+        prompt_tokens=token_counts["input_tokens"],
+        completion_tokens=token_counts["output_tokens"],
     )
     total_cost = input_cost + output_cost
 
     print(
         f"""
 {LIGHT_ORANGE} 🧮 TOKENS{RESET_COLOR}
-    {LIGHT_PINK}Content: {LIGHT_BLUE}{content_tokens:,}{RESET_COLOR}
-    {LIGHT_PINK} Images: {LIGHT_BLUE}{image_tokens:,}{RESET_COLOR}
-    {LIGHT_PINK}     In: {LIGHT_BLUE}{input_tokens:,}{RESET_COLOR}
-    {LIGHT_PINK}    Out: {LIGHT_BLUE}{output_tokens:,}{RESET_COLOR}"""
+    {LIGHT_PINK}Content: {LIGHT_BLUE}{token_counts['content_tokens']:,}{RESET_COLOR}
+    {LIGHT_PINK} Images: {LIGHT_BLUE}{token_counts['image_tokens']:,}{RESET_COLOR}
+    {LIGHT_PINK}     In: {LIGHT_BLUE}{token_counts['input_tokens']:,}{RESET_COLOR}
+    {LIGHT_PINK}    Out: {LIGHT_BLUE}{token_counts['output_tokens']:,}{RESET_COLOR}
+    {LIGHT_PINK}  Total: {LIGHT_BLUE}{token_counts['total_tokens']:,}{RESET_COLOR}"""
     )
     if total_cost:
         print(

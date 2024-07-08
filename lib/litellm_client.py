@@ -105,7 +105,7 @@ def create_litellm_client_embeddings(
 
 def calculate_token_count(model, messages, encoding):
     """
-    Calculate the token count for the input and output.
+    Calculate the token count for the input and output, including image tokens.
 
     Args:
         model (str): The model to be used.
@@ -113,26 +113,52 @@ def calculate_token_count(model, messages, encoding):
         encoding (tiktoken.Encoding): The encoding to use for token counting.
 
     Returns:
-        tuple: Total input tokens, total output tokens, and combined total tokens.
+        dict: A dictionary containing token counts for different categories.
     """
-    total_input = 0
-    total_output = 0
+    token_counts = {
+        "content_tokens": 0,
+        "image_tokens": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0
+    }
+
     for message in messages:
         if message["role"] == "user":
             if isinstance(message["content"], list):
                 for content_item in message["content"]:
                     if content_item["type"] == "text":
-                        total_input += len(encoding.encode(content_item["text"], disallowed_special=()))
+                        tokens = len(encoding.encode(content_item["text"], disallowed_special=()))
+                        token_counts["content_tokens"] += tokens
+                        token_counts["input_tokens"] += tokens
+                    elif content_item["type"] == "image_url":
+                        image_url = content_item["image_url"]["url"]
+                        tokens = len(encoding.encode(image_url, disallowed_special=()))
+                        token_counts["image_tokens"] += tokens
+                        token_counts["input_tokens"] += tokens
             else:
-                total_input += len(encoding.encode(message["content"], disallowed_special=()))
+                tokens = len(encoding.encode(message["content"], disallowed_special=()))
+                token_counts["content_tokens"] += tokens
+                token_counts["input_tokens"] += tokens
         else:
             if isinstance(message["content"], list):
                 for content_item in message["content"]:
                     if content_item["type"] == "text":
-                        total_output += len(encoding.encode(content_item["text"], disallowed_special=()))
+                        tokens = len(encoding.encode(content_item["text"], disallowed_special=()))
+                        token_counts["content_tokens"] += tokens
+                        token_counts["output_tokens"] += tokens
+                    elif content_item["type"] == "image_url":
+                        image_url = content_item["image_url"]["url"]
+                        tokens = len(encoding.encode(image_url, disallowed_special=()))
+                        token_counts["image_tokens"] += tokens
+                        token_counts["output_tokens"] += tokens
             else:
-                total_output += len(encoding.encode(message["content"], disallowed_special=()))
-    return total_input, total_output, total_input + total_output
+                tokens = len(encoding.encode(message["content"], disallowed_special=()))
+                token_counts["content_tokens"] += tokens
+                token_counts["output_tokens"] += tokens
+
+    token_counts["total_tokens"] = token_counts["input_tokens"] + token_counts["output_tokens"]
+    return token_counts
 
 
 def raw_token_count(text, model):
