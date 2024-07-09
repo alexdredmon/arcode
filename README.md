@@ -114,11 +114,10 @@ Set API keys based on the provider(s) you're using - these values should be pres
 
 ## Arguments:
 ```bash
-usage: arcode [-h] [--dir DIR] [--autowrite AUTOWRITE] [--focused FOCUSED] [--model MODEL]
-                 [--model_embedding MODEL_EMBEDDING] [--mode {implement,question}] [--ignore [IGNORE ...]]
-                 [--resources [RESOURCES ...]] [--token_count_by_file TOKEN_COUNT_BY_FILE] [--models [MODELS]]
-                 [--max-estimated-cost MAX_ESTIMATED_COST]
-                 [requirements ...]
+usage: arcode [-h] [--dir DIR] [--auto-write AUTO_WRITE] [--focused FOCUSED] [--model MODEL] [--model-embedding MODEL_EMBEDDING]
+              [--mode {implement,question}] [--ignore [IGNORE ...]] [--resources [RESOURCES ...]] [--images [IMAGES ...]] [--debug]
+              [--models [MODELS]] [--max-estimated-cost MAX_ESTIMATED_COST] [--max-file-size MAX_FILE_SIZE]
+              [requirements ...]
 
 positional arguments:
   requirements          Requirements for features to build on the codebase or question to ask about the codebase.
@@ -126,18 +125,16 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --dir DIR             The working directory of the codebase, default to current directory.
-  --autowrite AUTOWRITE
-                        Whether or not to immediately write the changeset. Useful when piping to arcode, e.g. cat
-                        feature.txt | arcode
-  --focused FOCUSED     Enable focused mode to limit file context provided based on relevancy using embeddings -
-                        accepts an integer containing number of file chunks to limit context to.
+  --auto-write AUTO_WRITE
+                        Whether or not to immediately write the changeset. Useful when piping to arcode, e.g. cat feature.txt |
+                        arcode
+  --focused FOCUSED     Enable focused mode to limit file context provided based on relevancy using embeddings - accepts an integer
+                        containing number of file chunks to limit context to.
   --model MODEL         LLM provider/model to use with LiteLLM, default to openai/gpt-4o.
-  --model_embedding MODEL_EMBEDDING
-                        LLM provider/model to use for embeddings with LiteLLM, default to openai/text-
-                        embedding-3-small.
+  --model-embedding MODEL_EMBEDDING
+                        LLM provider/model to use for embeddings with LiteLLM, default to openai/text-embedding-3-small.
   --mode {implement,question}
-                        Mode for the tool: "implement" for feature building and "question" for asking questions
-                        about the codebase.
+                        Mode for the tool: "implement" for feature building and "question" for asking questions about the codebase.
   --ignore [IGNORE ...]
                         Additional ignore patterns to use when parsing .gitignore
   --resources [RESOURCES ...]
@@ -147,9 +144,10 @@ options:
   --debug               Enable debug mode for additional output
   --models [MODELS]     List available models. Optionally provide a filter string.
   --max-estimated-cost MAX_ESTIMATED_COST
-                        Maximum estimated cost allowed. Actions with a larger estimated cost will not be allowed
-                        to execute. (integer or float with up to two decimal places)
-
+                        Maximum estimated cost allowed. Actions with a larger estimated cost will not be allowed to execute.
+                        (integer or float with up to two decimal places)
+  --max-file-size MAX_FILE_SIZE
+                        Maximum file size in bytes for files to be included in the prompt.
 ```
 
 ## Install
