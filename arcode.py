@@ -75,8 +75,7 @@ def main():
         print(f"{LIGHT_ORANGE}Error: {error}{RESET_COLOR}")
         return
 
-    print_configuration(args, requirements)
-
+    # Initialize encoding before print_configuration
     try:
         encoding = tiktoken.encoding_for_model(args.model.split("/")[-1])
     except Exception as e:
@@ -84,6 +83,9 @@ def main():
               f"{args.model}, defaulting to 'cl100k_base'.{RESET_COLOR}")
         encoding = tiktoken.get_encoding("cl100k_base")
     args.encoding = encoding
+
+    # Print configuration only once
+    print_configuration(args, requirements)
 
     # Initialize the token counter
     initialize_token_counter(args.model)

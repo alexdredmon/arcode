@@ -16,7 +16,7 @@ ARG_KEYS = [
     "models",
     "max-estimated-cost",
     "max-file-size",
-    "images",  # New argument added
+    "images",
 ]
 
 
