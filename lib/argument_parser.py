@@ -16,6 +16,7 @@ ARG_KEYS = [
     "models",
     "max-estimated-cost",
     "max-file-size",
+    "images",
 ]
 
 
@@ -93,6 +94,13 @@ def parse_arguments():
         nargs="*",
         type=str,
         help="List of URLs to fetch and include in the prompt context",
+        action=ProvidedAction,
+    )
+    parser.add_argument(
+        "--images",
+        nargs="*",
+        type=str,
+        help="List of image file paths to include in the prompt context",
         action=ProvidedAction,
     )
     parser.add_argument(

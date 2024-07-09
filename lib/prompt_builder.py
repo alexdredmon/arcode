@@ -21,6 +21,7 @@ from lib.shell_util import (
 from lib.embedding_util import get_top_relevant_files
 from lib.litellm_client import raw_token_count
 from lib.uploaded_file_filter import UploadedFileFilter
+from lib.image_util import process_image  # New import
 
 
 def build_prompt(args, requirements, files):
@@ -48,30 +49,45 @@ def build_prompt(args, requirements, files):
 
     f = io.StringIO()
     with redirect_stdout(f):
+        content = []
+        
         if args.resources:
-            print("\nResources:")
+            content.append({"type": "text", "text": "\nResources:"})
             for url in args.resources:
                 try:
                     response = requests.get(url)
                     response.raise_for_status()
                     soup = BeautifulSoup(response.content, "html.parser")
                     body_content = str(soup.body)
-                    print(f"\nURL: {url}\n{body_content}")
+                    content.append({"type": "text", "text": f"\nURL: {url}\n{body_content}"})
                 except requests.RequestException as e:
-                    print(f"Failed to fetch {url}: {e}")
+                    content.append({"type": "text", "text": f"Failed to fetch {url}: {e}"})
+
+        if args.images:
+            content.append({"type": "text", "text": "\nImages:"})
+            for image_path in args.images:
+                try:
+                    image_data = process_image(image_path)
+                    content.append({"type": "text", "text": f"\nImage: {image_path}"})
+                    content.append({"type": "image_url", "image_url": {"url": image_data}})
+                except Exception as e:
+                    content.append({"type": "text", "text": f"Failed to process image {image_path}: {e}"})
 
         if args.mode == "question":
-            print(QUESTION_PROMPT_PRE)
+            content.append({"type": "text", "text": QUESTION_PROMPT_PRE})
         else:
-            print(AUTODEV_PROMPT_PRE)
+            content.append({"type": "text", "text": AUTODEV_PROMPT_PRE})
 
-        print("Directory Tree:")
+        content.append({"type": "text", "text": "Directory Tree:"})
         # Map all_files to paths
         all_file_paths = [file["path"] for file in all_files]
-        print_files_as_tree(startpath, all_file_paths)
+        tree_output = io.StringIO()
+        with redirect_stdout(tree_output):
+            print_files_as_tree(startpath, all_file_paths)
+        content.append({"type": "text", "text": tree_output.getvalue()})
 
-        print("\nFile Contents:")
-        print(format_file_contents(files_to_upload))
+        content.append({"type": "text", "text": "\nFile Contents:"})
+        content.append({"type": "text", "text": format_file_contents(files_to_upload)})
 
         if args.mode == "question":
             prompt_post = QUESTION_PROMPT_POST_TEMPLATE.format(
@@ -82,9 +98,16 @@ def build_prompt(args, requirements, files):
                 requirements="\n".join(args.requirements_history)
             )
 
-        print(prompt_post)
+        content.append({"type": "text", "text": prompt_post})
 
-    return f.getvalue()
+        # Print the content for stdout capture
+        for item in content:
+            if item["type"] == "text":
+                print(item["text"])
+            elif item["type"] == "image_url":
+                print(f"[Image URL: {item['image_url']['url']}]")
+
+    return content
 
 def build_fileset(args, requirements):
     startpath = args.dir

@@ -11,7 +11,6 @@ DEFAULT_IGNORE_PATTERNS = [
     ".env",
     "node_modules",
     ".next",
-    ".github",
 ]
 
 

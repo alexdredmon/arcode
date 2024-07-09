@@ -19,7 +19,6 @@ from lib.shell_util import (
     RESET_COLOR,
 )
 
-
 def stream_response(client, args, messages):
     """
     Stream the response from the LLM client and handle file updates and formatting.

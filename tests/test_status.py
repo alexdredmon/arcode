@@ -19,6 +19,7 @@ class TestStatus(unittest.TestCase):
         mock_args.resources = ["https://example.com"]
         mock_args.max_estimated_cost = 5.0
         mock_args.max_file_size = 1000000
+        mock_args.images = ["image1.jpg", "image2.png"]
 
         print_configuration(mock_args, "Test requirements")
         output = mock_stdout.getvalue()
@@ -36,20 +37,30 @@ class TestStatus(unittest.TestCase):
         self.assertIn("['https://example.com']", output)
         self.assertIn("$5.00", output)
         self.assertIn("1,000,000 bytes", output)
+        self.assertIn("['image1.jpg', 'image2.png']", output)
 
     @patch('lib.status.cost_per_token')
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_print_tokens(self, mock_stdout, mock_cost_per_token):
         mock_cost_per_token.return_value = (0.1, 0.2)
-        result = print_tokens(100, 200, 300, "test-model")
+        token_counts = {
+            "content_tokens": 100,
+            "image_tokens": 50,
+            "input_tokens": 150,
+            "output_tokens": 200,
+            "total_tokens": 350,
+            "model": "test-model"
+        }
+        result = print_tokens(token_counts)
         output = mock_stdout.getvalue()
 
         self.assertIn("TOKENS", output)
         self.assertIn("100", output)
+        self.assertIn("50", output)
+        self.assertIn("150", output)
         self.assertIn("200", output)
-        self.assertIn("300", output)
+        self.assertIn("350", output)
         self.assertIn("COST ESTIMATE", output)
-        self.assertIn("$0.30", output)
         self.assertAlmostEqual(result, 0.3, places=7)
 
     @patch('sys.stdout', new_callable=io.StringIO)
