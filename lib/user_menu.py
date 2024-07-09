@@ -18,6 +18,12 @@ from lib.shell_util import (
 from lib.token_counter import get_token_counts, print_token_counts
 import sys
 
+def display_token_count_and_cost(messages):
+    """
+    Display token count and cost estimate.
+    """
+    get_token_counts(messages)
+    print_token_counts()
 
 def handle_user_menu(args, files, messages, streamed_response):
     answers = {"next_step": None}
@@ -65,8 +71,9 @@ def handle_user_menu(args, files, messages, streamed_response):
             }
         ]
 
-        get_token_counts(messages)
-        print_token_counts()
+        # Display token count and cost estimate only once
+        display_token_count_and_cost(messages)
+
         print(f"{LIGHT_ORANGE} ⚡️ ACTION: {RESET_COLOR}")
         exit_menu = False
         if args.auto_write:

@@ -21,7 +21,9 @@ from lib.shell_util import (
 )
 from lib.prompt_builder import build_prompt
 from lib.image_util import calculate_image_token_cost
+from lib.token_counter import initialize_token_counter, get_token_counts, add_initial_image_tokens, add_image_tokens, print_token_counts
 import tiktoken
+
 
 def main():
     """
@@ -83,6 +85,9 @@ def main():
         encoding = tiktoken.get_encoding("cl100k_base")
     args.encoding = encoding
 
+    # Initialize the token counter
+    initialize_token_counter(args.model)
+
     user_content = build_prompt(args, requirements, [])
 
     messages = [
@@ -92,23 +97,20 @@ def main():
 
     client = create_litellm_client(args.model)
 
-    # Calculate image token costs
-    total_image_tokens = 0
+    # Calculate image token costs and add to initial count
     if args.images:
         print(f"\n{LIGHT_ORANGE} 🖼️  IMAGES: {RESET_COLOR}")
+        total_image_tokens = 0
         for image_path in args.images:
             image_tokens = calculate_image_token_cost(image_path, encoding)
             total_image_tokens += image_tokens
             print(f"    {LIGHT_PINK}* {LIGHT_BLUE}{image_path} {LIGHT_ORANGE}({image_tokens:,} tokens){RESET_COLOR}")
+        add_initial_image_tokens(args.images)
         print(f"    {LIGHT_PINK}Total image tokens: {LIGHT_BLUE}{total_image_tokens:,}{RESET_COLOR}")
 
     try:
-        token_counts = calculate_token_count(args.model, messages, encoding)
-        token_counts['image_tokens'] = total_image_tokens
-        token_counts['input_tokens'] += total_image_tokens
-        token_counts['total_tokens'] += total_image_tokens
-        token_counts['model'] = args.model  # Add the model key to the token_counts dictionary
-        total_cost = print_tokens(token_counts)
+        token_counts = get_token_counts(messages)
+        total_cost = print_token_counts()
 
         if check_cost_exceeds_maximum(total_cost, args.max_estimated_cost):
             print(f"{LIGHT_RED}Operation cancelled due to exceeding cost limit.{RESET_COLOR}")

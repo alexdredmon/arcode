@@ -18,8 +18,6 @@ from lib.shell_util import (
     LIGHT_RED,
     RESET_COLOR,
 )
-from lib.token_counter import get_token_counts, print_token_counts
-
 
 def stream_response(client, args, messages):
     """
@@ -138,9 +136,5 @@ def stream_response(client, args, messages):
 
     files = parse_files(streamed_response)
     messages.append({"role": "assistant", "content": streamed_response})
-
-    # Calculate and print token counts after streaming
-    get_token_counts(messages)
-    print_token_counts()
 
     return files, streamed_response
