@@ -6,6 +6,8 @@ Always include an "ESTIMATED CHARACTERS:" heading followed by an estimated numbe
 
 Take a modular approach and implement DRY code - break into separate modules if/when possible.
 
+If the user requests an action that would require running CLI commands, e.g. spinning up a new react app (`npx create-react-app`) or making a new project folder called X (`mkdir X`), return a .sh file using the FILENAME: delimiter syntax specified below.  If the .sh file will be creating files/directories (e.g. `npx create-react-app`), do not attempt to create any files that might be overwritten / conflict with the files created by the executable file in the same response as the executable.
+
 Here's my codebase:
 """
 

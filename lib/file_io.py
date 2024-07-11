@@ -175,7 +175,11 @@ def write_files(files, base_dir, debug=False):
         files (list): List of files with filenames and contents.
         base_dir (str): The base directory where the files should be written.
         debug (bool): Flag to enable debug output.
+
+    Returns:
+        list: List of paths of the written files.
     """
+    written_files = []
     for file in files:
         try:
             file_path = os.path.join(base_dir, file["filename"])
@@ -189,8 +193,11 @@ def write_files(files, base_dir, debug=False):
                 f.write(file["contents"])
             
             print(f"Successfully wrote file: {file_path}")
+            written_files.append(file_path)
         except Exception as e:
             print(f"Error writing file {file['filename']}:\n{e}")
 
     if debug:
         print(f"Debug: Finished writing {len(files)} files")
+
+    return written_files
