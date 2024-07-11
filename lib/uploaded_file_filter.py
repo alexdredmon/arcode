@@ -29,6 +29,7 @@ DEFAULT_IGNORE_PATTERNS = [
     "**/.arcode.embeddings",
     "**/.DS_Store",
     "**/.env",
+    "**/package-lock.json"
 ]
 
 class UploadedFileFilter:
