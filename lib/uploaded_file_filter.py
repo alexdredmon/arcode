@@ -18,17 +18,17 @@ from lib.file_io import is_binary_file
 from lib.shell_util import LIGHT_BLUE, LIGHT_PINK, LIGHT_RED, RESET_COLOR
 
 DEFAULT_IGNORE_PATTERNS = [
-    "/.git/",
-    "/.github/",
-    "/.next/",
-    "__pycache__/",
-    "/node_modules/",
-    "/venv/",
-    ".arcode.cache.pkl",
-    ".arcode.checksum.txt",
-    ".arcode.embeddings",
-    ".DS_Store",
-    ".env",
+    "**/.git/**",
+    "**/.github/**",
+    "**/.next/**",
+    "**/__pycache__/**",
+    "**/node_modules/**",
+    "**/venv/**",
+    "**/.arcode.cache.pkl",
+    "**/.arcode.checksum.txt",
+    "**/.arcode.embeddings",
+    "**/.DS_Store",
+    "**/.env",
 ]
 
 class UploadedFileFilter:
@@ -97,7 +97,7 @@ class UploadedFileFilter:
         path = os.path.normpath(file)
         full_path = os.path.join(self.startpath, path)
 
-        if self.spec and self.spec.match_file(path):
+        if self.spec.match_file(path):
             return False
 
         if is_binary_file(full_path):

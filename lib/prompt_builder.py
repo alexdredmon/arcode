@@ -21,7 +21,7 @@ from lib.shell_util import (
 from lib.embedding_util import get_top_relevant_files
 from lib.litellm_client import raw_token_count
 from lib.uploaded_file_filter import UploadedFileFilter
-from lib.image_util import process_image  # New import
+from lib.image_util import process_image
 
 
 def build_prompt(args, requirements, files):
@@ -189,3 +189,16 @@ def print_inclusive_file_output_line(args, file):
         )
     else:
         print(f"    {LIGHT_PINK}* {LIGHT_BLUE}{path}")
+
+def reload_files(args):
+    """
+    Reload files from the working directory.
+
+    Args:
+        args (Namespace): The command line arguments.
+
+    Returns:
+        list: List of dictionaries containing file paths and data.
+    """
+    _, files_to_upload, _ = build_fileset(args, args.requirements_history[-1])
+    return files_to_upload
