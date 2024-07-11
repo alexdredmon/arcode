@@ -1,6 +1,6 @@
 import os
 from langchain_community.vectorstores import DocArrayInMemorySearch
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 from config import get_api_keys
 from lib.shell_util import (
@@ -61,7 +61,7 @@ def get_top_relevant_files(startpath, upload_filter, query, model_embedding, num
     if not file_contents:
         return []
 
-    text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=20)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=2500, chunk_overlap=20)
     docs = text_splitter.split_documents(file_contents)
 
     db = DocArrayInMemorySearch.from_documents(docs, cached_embedder)
