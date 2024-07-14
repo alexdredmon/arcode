@@ -3,7 +3,7 @@ import os
 import requests
 from contextlib import redirect_stdout
 from bs4 import BeautifulSoup
-from lib.file_io import get_files, print_files_as_tree, format_file_contents
+from lib.file_io import get_files, print_files_as_tree, format_file_contents, read_local_resource
 from lib.prompt_templates import (
     QUESTION_PROMPT_PRE,
     AUTODEV_PROMPT_PRE,
@@ -53,15 +53,25 @@ def build_prompt(args, requirements, files):
         
         if args.resources:
             content.append({"type": "text", "text": "\nResources:"})
-            for url in args.resources:
-                try:
-                    response = requests.get(url)
-                    response.raise_for_status()
-                    soup = BeautifulSoup(response.content, "html.parser")
-                    body_content = str(soup.body)
-                    content.append({"type": "text", "text": f"\nURL: {url}\n{body_content}"})
-                except requests.RequestException as e:
-                    content.append({"type": "text", "text": f"Failed to fetch {url}: {e}"})
+            for resource in args.resources:
+                if os.path.exists(resource):
+                    if os.path.isdir(resource):
+                        dir_content = read_local_resource(resource, args.ignore, args.max_file_size)
+                        content.append({"type": "text", "text": f"\nDirectory: {resource}\n{dir_content}"})
+                    else:
+                        file_content = read_local_resource(resource, args.ignore, args.max_file_size)
+                        content.append({"type": "text", "text": f"\nFile: {resource}\n{file_content}"})
+                elif resource.startswith(('http://', 'https://')):
+                    try:
+                        response = requests.get(resource)
+                        response.raise_for_status()
+                        soup = BeautifulSoup(response.content, "html.parser")
+                        body_content = str(soup.body)
+                        content.append({"type": "text", "text": f"\nURL: {resource}\n{body_content}"})
+                    except requests.RequestException as e:
+                        content.append({"type": "text", "text": f"Failed to fetch {resource}: {e}"})
+                else:
+                    content.append({"type": "text", "text": f"Invalid resource: {resource}"})
 
         if args.images:
             content.append({"type": "text", "text": "\nImages:"})

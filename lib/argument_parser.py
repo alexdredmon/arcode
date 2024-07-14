@@ -93,7 +93,7 @@ def parse_arguments():
         "--resources",
         nargs="*",
         type=str,
-        help="List of URLs to fetch and include in the prompt context",
+        help="List of URLs, local directories, or files to include in the prompt context",
         action=ProvidedAction,
     )
     parser.add_argument(

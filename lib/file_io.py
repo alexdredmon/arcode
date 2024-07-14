@@ -201,3 +201,35 @@ def write_files(files, base_dir, debug=False):
         print(f"Debug: Finished writing {len(files)} files")
 
     return written_files
+
+def read_local_resource(path, ignore_patterns, max_file_size):
+    """
+    Read content from a local file or directory.
+
+    Args:
+        path (str): Path to the local file or directory.
+        ignore_patterns (list): List of patterns to ignore.
+        max_file_size (int): Maximum file size in bytes.
+
+    Returns:
+        str: Content of the file or directory.
+    """
+    if os.path.isdir(path):
+        content = ""
+        for root, dirs, files in os.walk(path):
+            dirs[:] = [d for d in dirs if not is_ignored(os.path.join(root, d), ignore_patterns)]
+            files = [f for f in files if not is_ignored(os.path.join(root, f), ignore_patterns)]
+            for file in files:
+                file_path = os.path.join(root, file)
+                if os.path.getsize(file_path) <= max_file_size and not is_binary_file(file_path):
+                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        content += f"\n--- {file_path} ---\n{f.read()}\n"
+        return content
+    elif os.path.isfile(path):
+        if os.path.getsize(path) <= max_file_size and not is_binary_file(path):
+            with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                return f.read()
+        else:
+            return f"File {path} exceeds size limit or is a binary file."
+    else:
+        return f"Invalid path: {path}"
