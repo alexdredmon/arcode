@@ -170,18 +170,28 @@ options:
     git clone https://github.com/alexdredmon/arcode
     cd arcode
     ```
-2. Create & activate virtual environment:
+2. Install pyenv (if not already installed):
     ```bash
-    virtualenv venv
+    brew install pyenv
+    ```
+3. Install Python 3.9 using pyenv:
+    ```bash
+    pyenv install 3.9
+    ```
+4. Set local Python version:
+    ```bash
+    pyenv local 3.9
+    ```
+5. Create & activate virtual environment:
+    ```bash
+    python -m venv venv
     source venv/bin/activate
     ```
-
-3. Install the required dependencies:
+6. Install the required dependencies:
     ```bash
     pip install -r requirements.txt
     ```
-
-4. Set your OpenAI API key:
+7. Set your OpenAI API key:
     ```bash
     export OPENAI_API_KEY=<your_openai_api_key>
     ```

@@ -56,7 +56,8 @@ a = Analysis(
     hiddenimports=["pkg_resources", "pkg_resources.extern"]
     + tiktoken_submodules
     + litellm_submodules
-    + ["tiktoken_ext.openai_public", "tiktoken_ext"],
+    + ["tiktoken_ext.openai_public", "tiktoken_ext"]
+    + ['_cffi_backend'],  # Add _cffi_backend to hiddenimports
     hookspath=[],
     runtime_hooks=['set_magic_env.py'],  # Add the runtime hook
     excludes=[],
@@ -65,6 +66,11 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
+
+# Explicitly add libSystem.B.dylib
+if sys.platform == 'darwin':
+    a.binaries += [('/usr/lib/libSystem.B.dylib', '/usr/lib/libSystem.B.dylib', 'BINARY')]
+
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
