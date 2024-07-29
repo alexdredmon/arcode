@@ -1,12 +1,12 @@
 beautifulsoup4==4.12.3
 boto3>=1.28.57
 inquirerpy==0.3.4
-openai==1.36.1
+openai==1.37.1
 pyperclip==1.9.0
-langchain==0.2.10
-langchain-community==0.2.9
-langchain-core==0.2.22
-langchain-openai==0.1.17
+langchain==0.2.11
+langchain-community==0.2.10
+langchain-core==0.2.24
+langchain-openai==0.1.19
 langchain-text-splitters==0.2.2
 pydantic==2.8.2
 pydantic_core==2.20.1
@@ -14,7 +14,7 @@ docarray==0.40.0
 Pygments==2.18.0
 python-dotenv==1.0.1
 dill==0.3.8
-litellm==1.41.25
+litellm==1.42.5
 tiktoken
 pyinstaller==6.9.0
 python-magic
