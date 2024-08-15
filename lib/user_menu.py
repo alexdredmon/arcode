@@ -20,12 +20,14 @@ from lib.token_counter import get_token_counts, print_token_counts
 from lib.prompt_builder import reload_files
 import sys
 
+
 def display_token_count_and_cost(messages):
     """
     Display token count and cost estimate.
     """
     get_token_counts(messages)
     return print_token_counts()
+
 
 def run_script(file_path):
     """
@@ -34,16 +36,18 @@ def run_script(file_path):
     Args:
         file_path (str): The path to the script file.
     """
-    if file_path.endswith('.sh'):
-        subprocess.run(['chmod', '+x', file_path])
-        subprocess.run(['/bin/bash', file_path])
-    elif file_path.endswith('.py'):
-        subprocess.run(['python', file_path])
+    if file_path.endswith(".sh"):
+        subprocess.run(["chmod", "+x", file_path])
+        subprocess.run(["/bin/bash", file_path])
+    elif file_path.endswith(".py"):
+        subprocess.run(["python", file_path])
+
 
 def handle_user_menu(args, files, messages, streamed_response):
     answers = {"next_step": None}
 
     if sys.stdin.isatty():
+        files_written = False
         while True:
             choices = [
                 "💬 Followup prompt",
@@ -65,8 +69,10 @@ def handle_user_menu(args, files, messages, streamed_response):
                     if i > 0:
                         print("")
                     print(f"{LIGHT_PINK}    > {LIGHT_BLUE}{req}{RESET_COLOR}")
-
-                print(f"\n{LIGHT_ORANGE} 📁 FILES TO UPDATE: {RESET_COLOR}")
+                if files_written:
+                    print(f"\n{LIGHT_ORANGE} 📁 FILES UPDATED: {RESET_COLOR}")
+                else:
+                    print(f"\n{LIGHT_ORANGE} 📁 FILES TO UPDATE: {RESET_COLOR}")
 
             # Print file changes
             for file in files:
@@ -90,7 +96,11 @@ def handle_user_menu(args, files, messages, streamed_response):
                     "choices": choices,
                 }
             ]
-
+            if files_written:
+                print(
+                    f"\n{LIGHT_ORANGE} ✅ {LIGHT_GREEN}CHANGESET WRITTEN {RESET_COLOR}\n"
+                )
+                files_written = False
             print(f"{LIGHT_ORANGE} ⚡️ ACTION: {RESET_COLOR}")
             answers = prompt(questions)
 
@@ -104,11 +114,15 @@ def handle_user_menu(args, files, messages, streamed_response):
                         pyperclip.copy(file["contents"])
             elif answers["next_step"] == "🏗️  Write changeset to files":
                 written_files = write_files(files, args.dir)
-                print(f"\n{LIGHT_ORANGE} ✅ CHANGESET WRITTEN {RESET_COLOR}")
+                files_written = True
                 for file_path in written_files:
-                    if file_path.endswith(('.sh')):
-                        print(f"\n ⚡️ {LIGHT_ORANGE}EXECUTABLE DETECTED{RESET_COLOR}")
-                        print(f"    - {LIGHT_PINK}{os.path.basename(file_path)}{RESET_COLOR}")
+                    if file_path.endswith((".sh")):
+                        print(
+                            f"\n ⚡️ {LIGHT_ORANGE}EXECUTABLE DETECTED{RESET_COLOR}"
+                        )
+                        print(
+                            f"    - {LIGHT_PINK}{os.path.basename(file_path)}{RESET_COLOR}"
+                        )
                         run_question = [
                             {
                                 "type": "confirm",
@@ -119,30 +133,48 @@ def handle_user_menu(args, files, messages, streamed_response):
                         ]
                         run_answer = prompt(run_question)
                         if run_answer["run_script"]:
-                            print(f"\n{LIGHT_ORANGE} 🏃‍♀️ Running {os.path.basename(file_path)}...{RESET_COLOR}")
+                            print(
+                                f"\n{LIGHT_ORANGE} 🏃‍♀️ Running {os.path.basename(file_path)}...{RESET_COLOR}"
+                            )
                             run_script(file_path)
-                            print(f"\n{LIGHT_ORANGE} ✅ Script execution completed{RESET_COLOR}")
-                            
+                            print(
+                                f"\n{LIGHT_ORANGE} ✅ Script execution completed{RESET_COLOR}"
+                            )
+
                             # Automatically reload files after running the script
                             reloaded_files = reload_files(args)
-                            formatted_files = format_file_contents(reloaded_files)
-                            messages.append({
-                                "role": "user",
-                                "content": f"My files have been updated after running the script, here is their latest state:\n\n{formatted_files}"
-                            })
-                            print(f"\n{LIGHT_ORANGE} ✅ Files reloaded and appended to messages{RESET_COLOR}")
+                            formatted_files = format_file_contents(
+                                reloaded_files
+                            )
+                            messages.append(
+                                {
+                                    "role": "user",
+                                    "content": f"My files have been updated after running the script, here is their latest state:\n\n{formatted_files}",
+                                }
+                            )
+                            print(
+                                f"\n{LIGHT_ORANGE} ✅ Files reloaded and appended to messages{RESET_COLOR}"
+                            )
                             total_cost = display_token_count_and_cost(messages)
-                            print(f"{LIGHT_ORANGE} ℹ️  Updated token count and cost estimate shown above{RESET_COLOR}")
+                            print(
+                                f"{LIGHT_ORANGE} ℹ️  Updated token count and cost estimate shown above{RESET_COLOR}"
+                            )
             elif answers["next_step"] == "🔄 Reload files":
                 reloaded_files = reload_files(args)
                 formatted_files = format_file_contents(reloaded_files)
-                messages.append({
-                    "role": "user",
-                    "content": f"My files have been updated, here is their latest state:\n\n{formatted_files}"
-                })
-                print(f"\n{LIGHT_ORANGE} ✅ Files reloaded and appended to messages{RESET_COLOR}")
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": f"My files have been updated, here is their latest state:\n\n{formatted_files}",
+                    }
+                )
+                print(
+                    f"\n{LIGHT_ORANGE} ✅ Files reloaded and appended to messages{RESET_COLOR}"
+                )
                 total_cost = display_token_count_and_cost(messages)
-                print(f"{LIGHT_ORANGE} ℹ️  Updated token count and cost estimate shown above{RESET_COLOR}")
+                print(
+                    f"{LIGHT_ORANGE} ℹ️  Updated token count and cost estimate shown above{RESET_COLOR}"
+                )
             elif answers["next_step"] == "💬 Followup prompt":
                 followup = input(f"     {LIGHT_PINK}> {LIGHT_BLUE}")
                 messages.append({"role": "user", "content": followup})
@@ -155,20 +187,30 @@ def handle_user_menu(args, files, messages, streamed_response):
             written_files = write_files(files, args.dir)
             print(f"\n{LIGHT_ORANGE} ✅ CHANGESET WRITTEN {RESET_COLOR}")
             for file_path in written_files:
-                if file_path.endswith(('.sh', '.py')):
-                    print(f"\n{LIGHT_ORANGE} 🚀 Running {os.path.basename(file_path)}...{RESET_COLOR}")
+                if file_path.endswith((".sh", ".py")):
+                    print(
+                        f"\n{LIGHT_ORANGE} 🚀 Running {os.path.basename(file_path)}...{RESET_COLOR}"
+                    )
                     run_script(file_path)
-                    print(f"\n{LIGHT_ORANGE} ✅ Script execution completed{RESET_COLOR}")
-                    
+                    print(
+                        f"\n{LIGHT_ORANGE} ✅ Script execution completed{RESET_COLOR}"
+                    )
+
                     # Automatically reload files after running the script
                     reloaded_files = reload_files(args)
                     formatted_files = format_file_contents(reloaded_files)
-                    messages.append({
-                        "role": "user",
-                        "content": f"My files have been updated after running the script, here is their latest state:\n\n{formatted_files}"
-                    })
-                    print(f"\n{LIGHT_ORANGE} ✅ Files reloaded and appended to messages{RESET_COLOR}")
+                    messages.append(
+                        {
+                            "role": "user",
+                            "content": f"My files have been updated after running the script, here is their latest state:\n\n{formatted_files}",
+                        }
+                    )
+                    print(
+                        f"\n{LIGHT_ORANGE} ✅ Files reloaded and appended to messages{RESET_COLOR}"
+                    )
                     total_cost = display_token_count_and_cost(messages)
-                    print(f"{LIGHT_ORANGE} ℹ️  Updated token count and cost estimate shown above{RESET_COLOR}")
+                    print(
+                        f"{LIGHT_ORANGE} ℹ️  Updated token count and cost estimate shown above{RESET_COLOR}"
+                    )
 
     return answers
