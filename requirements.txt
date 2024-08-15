@@ -9,7 +9,7 @@ langchain-core==0.2.29
 langchain-openai==0.1.21
 langchain-text-splitters==0.2.2
 pydantic==2.8.2
-pydantic_core==2.21.0
+pydantic_core==2.20.1
 docarray==0.40.0
 Pygments==2.18.0
 python-dotenv==1.0.1
