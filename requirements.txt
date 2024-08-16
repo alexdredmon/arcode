@@ -15,7 +15,7 @@ Pygments==2.18.0
 python-dotenv==1.0.1
 dill==0.3.8
 litellm==1.43.7
-tiktoken
+tiktoken==0.7.0
 pyinstaller==6.10.0
-python-magic
-pathspec
+python-magic==0.4.27
+pathspec==0.12.1
