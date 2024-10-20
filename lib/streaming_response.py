@@ -1,4 +1,3 @@
-from litellm.llms.openai import OpenAIError
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import TerminalFormatter
@@ -18,6 +17,7 @@ from lib.shell_util import (
     LIGHT_RED,
     RESET_COLOR,
 )
+
 
 def stream_response(client, args, messages):
     """
@@ -131,7 +131,7 @@ def stream_response(client, args, messages):
         else:
             print(f"{output_padding}{LIGHT_BLUE}{since_last_line}")
 
-    except OpenAIError as e:
+    except Exception as e:
         print(f"{BLACK_BACKGROUND}{LIGHT_RED}{e.message}{RESET_COLOR}")
 
     files = parse_files(streamed_response)
