@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import sys
+import tiktoken
+
 from InquirerPy import inquirer
 from config import get_api_keys
 from lib.argument_parser import parse_arguments
@@ -22,8 +24,7 @@ from lib.shell_util import (
 from lib.prompt_builder import build_prompt
 from lib.image_util import calculate_image_token_cost
 from lib.token_counter import initialize_token_counter, get_token_counts, add_initial_image_tokens, add_image_tokens, print_token_counts
-import tiktoken
-
+from lib.input_util import get_multiline_input
 
 def main():
     """
@@ -57,7 +58,7 @@ def main():
     # Prompt for requirements if not provided
     if not requirements:
         print(f"{LIGHT_ORANGE} 🕹️  What are your requirements?")
-        requirements = input(f"{LIGHT_PINK}    > {LIGHT_BLUE}")
+        requirements = get_multiline_input("    > ")
 
     # Exit if still no requirements
     if not requirements:

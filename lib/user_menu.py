@@ -18,6 +18,7 @@ from lib.shell_util import (
 )
 from lib.token_counter import get_token_counts, print_token_counts
 from lib.prompt_builder import reload_files
+from lib.input_util import get_multiline_input
 import sys
 
 
@@ -176,7 +177,7 @@ def handle_user_menu(args, files, messages, streamed_response):
                     f"{LIGHT_ORANGE} ℹ️  Updated token count and cost estimate shown above{RESET_COLOR}"
                 )
             elif answers["next_step"] == "💬 Followup prompt":
-                followup = input(f"     {LIGHT_PINK}> {LIGHT_BLUE}")
+                followup = get_multiline_input("     > ")
                 messages.append({"role": "user", "content": followup})
                 return answers
             elif answers["next_step"] == "🚪 Exit":
