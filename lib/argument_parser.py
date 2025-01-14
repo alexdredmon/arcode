@@ -8,6 +8,7 @@ ARG_KEYS = [
     "auto-write",
     "focused",
     "model",
+    "max-tokens",
     "model-embedding",
     "mode",
     "ignore",
@@ -58,6 +59,13 @@ def parse_arguments():
         type=str,
         default="openai/gpt-4o",
         help="LLM provider/model to use with LiteLLM, default to openai/gpt-4o.",
+        action=ProvidedAction,
+    )
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=8192,
+        help="Max number of output tokens",
         action=ProvidedAction,
     )
     parser.add_argument(

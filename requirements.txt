@@ -19,3 +19,4 @@ tiktoken==0.8.0
 pyinstaller==6.11.0
 python-magic==0.4.27
 pathspec==0.12.1
+tqdm

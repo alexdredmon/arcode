@@ -21,6 +21,7 @@ def print_configuration(args, requirements):
         LIGHT_ORANGE + " ⚙️  CONFIGURATION: " + RESET_COLOR + "\n" +
         LIGHT_PINK + "          Directory: " + LIGHT_BLUE + str(args.dir) + RESET_COLOR + "\n" +
         LIGHT_PINK + "              Model: " + LIGHT_BLUE + str(args.model) + RESET_COLOR + "\n" +
+        LIGHT_PINK + "         Max tokens: " + LIGHT_BLUE + str(args.model) + RESET_COLOR + "\n" +
         LIGHT_PINK + "    Embedding Model: " + LIGHT_BLUE + str(args.model_embedding) + RESET_COLOR + "\n" +
         LIGHT_PINK + "         Auto-write: " + LIGHT_BLUE + str(args.auto_write) + RESET_COLOR + "\n" +
         LIGHT_PINK + "            Focused: " + LIGHT_BLUE + str(args.focused) + RESET_COLOR + "\n" +

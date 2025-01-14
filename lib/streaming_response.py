@@ -35,7 +35,12 @@ def stream_response(client, args, messages):
     streamed_response = ""
 
     try:
-        completion = client(model=args.model, messages=messages, stream=True)
+        completion = client(
+            model=args.model,
+            messages=messages,
+            stream=True,
+            max_tokens=args.max_tokens,
+        )
 
         print(f"\n{LIGHT_ORANGE} 🌐 STREAMING RESPONSE: {RESET_COLOR}\n")
         streamed_response = ""
