@@ -142,7 +142,7 @@ def parse_arguments():
     parser.add_argument(
         "--temperature",
         type=float,
-        default=.5,
+        default=1,
         help="Temperature to use for the LLM",
         action=ProvidedAction,
     )

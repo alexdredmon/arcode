@@ -114,40 +114,65 @@ Set API keys based on the provider(s) you're using - these values should be pres
 
 ## Arguments:
 ```bash
-usage: arcode [-h] [--dir DIR] [--auto-write AUTO_WRITE] [--focused FOCUSED] [--model MODEL] [--model-embedding MODEL_EMBEDDING]
-              [--mode {implement,question}] [--ignore [IGNORE ...]] [--resources [RESOURCES ...]] [--images [IMAGES ...]] [--debug]
-              [--models [MODELS]] [--max-estimated-cost MAX_ESTIMATED_COST] [--max-file-size MAX_FILE_SIZE]
+usage: arcode [-h] [--dir DIR] [--auto-write AUTO_WRITE] [--focused FOCUSED]
+              [--model MODEL] [--max-tokens MAX_TOKENS]
+              [--model-embedding MODEL_EMBEDDING]
+              [--mode {implement,question}] [--ignore [IGNORE ...]]
+              [--resources [RESOURCES ...]] [--images [IMAGES ...]] [--debug]
+              [--models [MODELS]] [--max-estimated-cost MAX_ESTIMATED_COST]
+              [--max-file-size MAX_FILE_SIZE] [--temperature TEMPERATURE]
               [requirements ...]
 
+arcode: AI driven development tool
+
 positional arguments:
-  requirements          Requirements for features to build on the codebase or question to ask about the codebase.
+  requirements          Requirements for features to build on the codebase or
+                        question to ask about the codebase.
 
 options:
   -h, --help            show this help message and exit
-  --dir DIR             The working directory of the codebase, default to current directory.
+  --dir DIR             The working directory of the codebase, default to
+                        current directory.
   --auto-write AUTO_WRITE
-                        Whether or not to immediately write the changeset. Useful when piping to arcode, e.g. cat feature.txt |
+                        Whether or not to immediately write the changeset.
+                        Useful when piping to arcode, e.g. cat feature.txt |
                         arcode
-  --focused FOCUSED     Enable focused mode to limit file context provided based on relevancy using embeddings - accepts an integer
-                        containing number of file chunks to limit context to.
-  --model MODEL         LLM provider/model to use with LiteLLM, default to openai/gpt-4o.
+  --focused FOCUSED     Enable focused mode to limit file context provided
+                        based on relevancy using embeddings - accepts an
+                        integer containing number of file chunks to limit
+                        context to.
+  --model MODEL         LLM provider/model to use with LiteLLM, default to
+                        openai/gpt-4o.
+  --max-tokens MAX_TOKENS
+                        Max number of output tokens
   --model-embedding MODEL_EMBEDDING
-                        LLM provider/model to use for embeddings with LiteLLM, default to openai/text-embedding-3-small.
+                        LLM provider/model to use for embeddings with LiteLLM,
+                        default to openai/text-embedding-3-small.
   --mode {implement,question}
-                        Mode for the tool: "implement" for feature building and "question" for asking questions about the codebase.
+                        Mode for the tool: "implement" for feature building
+                        and "question" for asking questions about the
+                        codebase.
   --ignore [IGNORE ...]
-                        Additional ignore patterns to use when parsing .gitignore
+                        Additional ignore patterns to use when parsing
+                        .gitignore
   --resources [RESOURCES ...]
-                        List of URLs to fetch and include in the prompt context
+                        List of URLs to fetch and include in the prompt
+                        context
   --images [IMAGES ...]
-                        List of image file paths to include in the prompt context
+                        List of image file paths to include in the prompt
+                        context
   --debug               Enable debug mode for additional output
-  --models [MODELS]     List available models. Optionally provide a filter string.
+  --models [MODELS]     List available models. Optionally provide a filter
+                        string.
   --max-estimated-cost MAX_ESTIMATED_COST
-                        Maximum estimated cost allowed. Actions with a larger estimated cost will not be allowed to execute.
+                        Maximum estimated cost allowed. Actions with a larger
+                        estimated cost will not be allowed to execute.
                         (integer or float with up to two decimal places)
   --max-file-size MAX_FILE_SIZE
-                        Maximum file size in bytes for files to be included in the prompt.
+                        Maximum file size in bytes for files to be included in
+                        the prompt.
+  --temperature TEMPERATURE
+                        Temperature to use for the LLM
 ```
 
 ## Install
