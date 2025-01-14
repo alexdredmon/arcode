@@ -138,7 +138,7 @@ def parse_arguments():
         help="Maximum file size in bytes for files to be included in the prompt.",
         action=ProvidedAction,
     )
-
+    
     # Set defaults for all custom provided flags
     for arg in ARG_KEYS:
         parser.set_defaults(**{f"{arg}_provided": False})
@@ -146,8 +146,13 @@ def parse_arguments():
     cli_args = parser.parse_args()
 
     # Validate max-estimated-cost
-    if cli_args.max_estimated_cost < 0 or round(cli_args.max_estimated_cost, 2) != cli_args.max_estimated_cost:
-        parser.error("max-estimated-cost must be a non-negative number with at most two decimal places")
+    if (
+        cli_args.max_estimated_cost < 0
+        or round(cli_args.max_estimated_cost, 2) != cli_args.max_estimated_cost
+    ):
+        parser.error(
+            "max-estimated-cost must be a non-negative number with at most two decimal places"
+        )
 
     # First check for the global configuration file
     global_config_path = os.path.expanduser("~/.config/arcodeconf.yml")
@@ -182,7 +187,9 @@ def load_configurations(cli_args, config_path):
                     elif snake_key in config_args and not getattr(
                         cli_args, f"{snake_key}_provided", False
                     ):
-                        setattr(cli_args, snake_key, config_args.get(snake_key))
+                        setattr(
+                            cli_args, snake_key, config_args.get(snake_key)
+                        )
 
             env_args = config.get("env", {})
             if env_args:

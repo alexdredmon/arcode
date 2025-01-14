@@ -2,7 +2,6 @@ import os
 from .gitignore_parser import is_ignored
 import magic
 from collections import defaultdict
-from tqdm import tqdm
 
 from .constants import binary_extensions
 from .file_parser import (
@@ -14,7 +13,7 @@ from .file_parser import (
     extract_estimated_characters
 )
 from .shell_util import (
-    LIGHT_PINK, LIGHT_GREEN, RESET_COLOR
+    LIGHT_BLUE, LIGHT_PINK, LIGHT_GREEN, RESET_COLOR
 )
 
 def is_binary_file(filename):
@@ -106,23 +105,6 @@ def print_tree(startpath, ignore_patterns, prefix=""):
         for f in files:
             print(f"{prefix}{subindent}{f}")
 
-def count_files_and_dirs(startpath, upload_filter):
-    """
-    Count the total number of files and directories recursively.
-
-    Args:
-        startpath (str): The starting directory path.
-        upload_filter (UploadedFileFilter): Filter object for file upload decisions.
-
-    Returns:
-        int: Total number of files and directories.
-    """
-    total_count = 0
-    for root, dirs, files in os.walk(startpath):
-        total_count += len(dirs)
-        total_count += sum(1 for f in files if upload_filter.should_upload(os.path.relpath(os.path.join(root, f), startpath)))
-    return total_count
-
 def get_files(startpath, upload_filter):
     """
     Retrieve files from the given starting path, ignoring specific patterns, binary files, and files exceeding max size.
@@ -134,38 +116,34 @@ def get_files(startpath, upload_filter):
     Returns:
         list: List of dictionaries containing file paths and data.
     """
+    print(f"{LIGHT_BLUE} 🕰️  Scanning your codebase...{RESET_COLOR}")
     all_files = []
-    total_items = count_files_and_dirs(startpath, upload_filter)
-
-    with tqdm(total=total_items, desc="Processing files", unit="item") as pbar:
-        for root, dirs, files in os.walk(startpath):
-            pbar.update(len(dirs))
-            files = [
-                f
-                for f in files
-                if upload_filter.should_upload(os.path.relpath(os.path.join(root, f), startpath))
-            ]
-            for f in files:
-                file_path = os.path.relpath(os.path.join(root, f), startpath)
-                full_path = os.path.join(root, f)
-                try:
-                    with open(
-                        full_path,
-                        "r",
-                        encoding="utf-8",
-                        errors="ignore",
-                    ) as file:
-                        all_files.append(
-                            {
-                                "path": file_path,
-                                "data": file.read(),
-                            }
-                        )
-                except UnicodeDecodeError as e:
-                    print(f"Error reading file {file_path}: {e}")
-                except Exception as e:
-                    print(f"Unknown error reading file: {file_path}: {e}")
-                pbar.update(1)
+    for root, _, files in os.walk(startpath):
+        files = [
+            f
+            for f in files
+            if upload_filter.should_upload(os.path.relpath(os.path.join(root, f), startpath))
+        ]
+        for f in files:
+            file_path = os.path.relpath(os.path.join(root, f), startpath)
+            full_path = os.path.join(root, f)
+            try:
+                with open(
+                    full_path,
+                    "r",
+                    encoding="utf-8",
+                    errors="ignore",
+                ) as file:
+                    all_files.append(
+                        {
+                            "path": file_path,
+                            "data": file.read(),
+                        }
+                    )
+            except UnicodeDecodeError as e:
+                print(f"Error reading file {file_path}: {e}")
+            except Exception as e:
+                print(f"Unknown error reading file: {file_path}: {e}")
     return all_files
 
 def calculate_line_difference(filepath, new_content):

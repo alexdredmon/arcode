@@ -12,7 +12,9 @@ class TokenCounter:
         try:
             return tiktoken.encoding_for_model(model.split("/")[-1])
         except Exception:
-            print(f" ⚠️  No model-specific encoding for {model}, defaulting to 'cl100k_base'.")
+            print(
+                f"{LIGHT_BLUE} 💁‍♀️ Defaulting to 'cl100k_base' - no model-specific encoding for {args.model}.{RESET_COLOR}"
+            )
             return tiktoken.get_encoding("cl100k_base")
 
     def reset_counts(self):
