@@ -40,6 +40,7 @@ def stream_response(client, args, messages):
             messages=messages,
             stream=True,
             max_tokens=args.max_tokens,
+            temperature=args.temperature,
         )
 
         print(f"\n{LIGHT_ORANGE} 🌐 STREAMING RESPONSE: {RESET_COLOR}\n")

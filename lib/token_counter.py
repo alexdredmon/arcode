@@ -1,6 +1,10 @@
 import tiktoken
 from lib.image_util import calculate_image_token_cost
 from lib.status import print_tokens as _print_tokens
+from lib.shell_util import (
+    LIGHT_BLUE,
+    RESET_COLOR,
+)
 
 class TokenCounter:
     def __init__(self, model):
@@ -13,7 +17,7 @@ class TokenCounter:
             return tiktoken.encoding_for_model(model.split("/")[-1])
         except Exception:
             print(
-                f"{LIGHT_BLUE} 💁‍♀️ Defaulting to 'cl100k_base' - no model-specific encoding for {args.model}.{RESET_COLOR}"
+                f"{LIGHT_BLUE} 💁‍♀️ Defaulting to 'cl100k_base' - no model-specific encoding for {model}.{RESET_COLOR}"
             )
             return tiktoken.get_encoding("cl100k_base")
 

@@ -11,7 +11,6 @@ from lib.shell_util import (
     RESET_COLOR,
 )
 
-
 def initialize_core_imports():
     print(f"{LIGHT_BLUE} 🕰️  Initializing core imports...{RESET_COLOR}")
     global inquirer, get_multiline_input, get_available_models
@@ -91,7 +90,7 @@ def get_requirements(args):
     elif not sys.stdin.isatty():
         return sys.stdin.read().strip()
     else:
-        print(f"{LIGHT_ORANGE} 🕹️  What are your requirements?")
+        print(f"\n{LIGHT_ORANGE} 🕹️  What are your requirements?")
         return get_multiline_input("    > ")
 
 
@@ -224,6 +223,7 @@ def main():
         print(f"{LIGHT_ORANGE}No requirements provided. Exiting.{RESET_COLOR}")
         return
 
+    print("")
     # Process requirements
     process_requirements(args, requirements)
 

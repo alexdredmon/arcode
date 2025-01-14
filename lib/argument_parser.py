@@ -18,6 +18,7 @@ ARG_KEYS = [
     "max-estimated-cost",
     "max-file-size",
     "images",
+    "temperature",
 ]
 
 
@@ -136,6 +137,13 @@ def parse_arguments():
         type=int,
         default=1000000,  # 1 MB default
         help="Maximum file size in bytes for files to be included in the prompt.",
+        action=ProvidedAction,
+    )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=.5,
+        help="Temperature to use for the LLM",
         action=ProvidedAction,
     )
     
